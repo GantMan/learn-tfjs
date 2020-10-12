@@ -22,7 +22,7 @@
           cake.crossOrigin = 'anonymous'
           cake.src = '/cake.jpg'
           cake.onload = () => {
-            const cakeTensor = tf.browser.fromPixels(cake, 3)
+            const cakeTensor = tf.browser.fromPixels(cake)
             console.log(
               `Successful conversion from Image() to a ${cakeTensor.shape} tensor`
             )
