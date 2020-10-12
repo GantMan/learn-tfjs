@@ -9,23 +9,25 @@
     <img id="gant" src="/gant.jpg" />
     <script>
       window.addEventListener('load', function () {
-        // Simply read from the DOM
-        const gantImage = document.getElementById('gant')
-        const gantTensor = tf.browser.fromPixels(gantImage)
-        console.log(
-          `Successful conversion from DOM to a ${gantTensor.shape} tensor`
-        )
-
-        // Now load an image object in JavaScript
-        const cake = new Image()
-        cake.crossOrigin = 'anonymous'
-        cake.src = '/cake.jpg'
-        cake.onload = () => {
-          const cakeTensor = tf.browser.fromPixels(cake)
+        tf.tidy(() => {
+          // Simply read from the DOM
+          const gantImage = document.getElementById('gant')
+          const gantTensor = tf.browser.fromPixels(gantImage)
           console.log(
-            `Successful conversion from Image() to a ${cakeTensor.shape} tensor`
+            `Successful conversion from DOM to a ${gantTensor.shape} tensor`
           )
-        }
+
+          // Now load an image object in JavaScript
+          const cake = new Image()
+          cake.crossOrigin = 'anonymous'
+          cake.src = '/cake.jpg'
+          cake.onload = () => {
+            const cakeTensor = tf.browser.fromPixels(cake, 3)
+            console.log(
+              `Successful conversion from Image() to a ${cakeTensor.shape} tensor`
+            )
+          }
+        })
       })
     </script>
   </body>
