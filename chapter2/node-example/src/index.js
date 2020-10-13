@@ -1,3 +1,3 @@
-import * as tf from '@tensorflow/tfjs-node'
+import * as tf from "@tensorflow/tfjs-node";
 
-console.log(tf.version.tfjs)
+console.log(tf.version.tfjs);
