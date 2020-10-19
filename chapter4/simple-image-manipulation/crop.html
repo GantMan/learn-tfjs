@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.6.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <h1>Crop Image Tensors</h1>
+    <div style="display:flex; justify-content: space-evenly;">
+      <div>
+        <h3>Actual Image <pre>[348, 500, 3]</pre></h3>
+        <img id="lemonade" src="/lemonade.jpg" />
+      </div>
+      <div>
+        <h3>Cropped Tensor <pre>[265, 245, 3]</pre></h3>
+        <canvas id="lemonadeCanvas" />
+
+      </div>
+
+    </div>
+
+    <a href="/">Back to index</a>
+    <script>
+      window.addEventListener("load", function () {
+        // Simple Tensor Crop
+        const startingPoint = [0, 40, 0];
+        const newSize = [265, 245, 3];
+        const lemonadeImage = document.getElementById("lemonade");
+        const lemonadeCanvas = document.getElementById("lemonadeCanvas");
+        const lemonadeTensor = tf.browser.fromPixels(lemonadeImage);
+
+        const cropped = tf.slice(lemonadeTensor, startingPoint, newSize)
+        tf.browser.toPixels(cropped, lemonadeCanvas).then(() => {
+          cropped.dispose();
+        })
+        lemonadeTensor.dispose();
+      });
+    </script>
+  </body>
+</html>
