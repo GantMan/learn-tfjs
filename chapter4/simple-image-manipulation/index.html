@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.1.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <h1>Images to Tensors</h1>
+    <h3>Our DOM image:</h3>
+    <img id="cake" src="/cake.jpg" />
+    <canvas id="cakeCanvas" />
+    <script>
+      window.addEventListener("load", function () {
+        // Simply read from the DOM
+        const cakeImage = document.getElementById("cake");
+        const cakeCanvas = document.getElementById("cakeCanvas");
+        const cakeTensor = tf.expandDims(
+          tf.browser.fromPixels(cakeImage).asType("float32")
+        );
+        const rotatedCake = tf
+          .squeeze(tf.image.rotateWithOffset(cakeTensor, 1))
+          .asType("int32");
+        tf.browser.toPixels(rotatedCake, cakeCanvas).then(() => {
+          cakeTensor.dispose();
+          rotatedCake.dispose();
+        });
+      });
+    </script>
+  </body>
+</html>
