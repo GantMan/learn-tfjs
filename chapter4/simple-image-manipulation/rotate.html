@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.1.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <h1>Rotate Image Tensors</h1>
+    <h3>Batch rotateWithOffset</h3>
+    <div>
+      <img id="cake" src="/cake.jpg" />
+      <canvas id="cakeCanvas" />
+    </div>
+    <a href="/">Back to index</a>
+    <script>
+      window.addEventListener("load", function () {
+        // Simply read from the DOM
+        const cakeImage = document.getElementById("cake");
+        const cakeCanvas = document.getElementById("cakeCanvas");
+        const cakeTensor = tf.expandDims(
+          tf.browser.fromPixels(cakeImage).asType("float32")
+        );
+        const rotatedCake = tf
+          .squeeze(tf.image.rotateWithOffset(cakeTensor, 1))
+          .asType("int32");
+        tf.browser.toPixels(rotatedCake, cakeCanvas).then(() => {
+          cakeTensor.dispose();
+          rotatedCake.dispose();
+        });
+      });
+    </script>
+  </body>
+</html>

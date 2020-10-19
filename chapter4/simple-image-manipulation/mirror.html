@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.6.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <h1>Mirror Image Tensors</h1>
+    <h3>Simple Tensor Reverse</h3>
+    <div>
+      <img id="lemonade" src="/lemonade.jpg" />
+      <canvas id="lemonadeCanvas" />
+    </div>
+    <h3>Batch flipLeftRight</h3>
+    <div>
+      <img id="cake" src="/cake.jpg" />
+      <canvas id="cakeCanvas" />
+    </div>
+    <a href="/">Back to index</a>
+    <script>
+      window.addEventListener("load", function () {
+        // Simple Tensor Flip
+        const lemonadeImage = document.getElementById("lemonade");
+        const lemonadeCanvas = document.getElementById("lemonadeCanvas");
+        const lemonadeTensor = tf.browser.fromPixels(lemonadeImage);
+        const flippedLemonadeTensor = tf.reverse(lemonadeTensor, 1)
+        tf.browser.toPixels(flippedLemonadeTensor, lemonadeCanvas).then(() => {
+          lemonadeTensor.dispose();
+          flippedLemonadeTensor.dispose();
+        })
+
+        // Batch Tensor Flip
+        const cakeImage = document.getElementById("cake");
+        const cakeCanvas = document.getElementById("cakeCanvas");
+        const flipCake = tf.tidy(() => {
+          const cakeTensor = tf.expandDims(
+            tf.browser.fromPixels(cakeImage).asType("float32")
+          );
+          return tf
+            .squeeze(tf.image.flipLeftRight(cakeTensor))
+            .asType("int32");
+        })
+        tf.browser.toPixels(flipCake, cakeCanvas).then(() => {
+          flipCake.dispose();
+        });
+      });
+    </script>
+  </body>
+</html>
