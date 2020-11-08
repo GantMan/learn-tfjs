@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.6.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <h1>Console Log for Result</h1>
+    <img id="mystery" src="/dog2.jpg" width="100%" />
+    <script>
+      tf.ready().then(() => {
+        const modelPath =
+          "https://s3.amazonaws.com/ir_public/ai/dnc_faces/tfjs_model/model.json";
+        tf.tidy(() => {
+          tf.loadLayersModel(modelPath).then((model) => {
+            const mysteryImage = document.getElementById("mystery");
+            const myTensor = tf.browser.fromPixels(mysteryImage);
+            // Model expects 256x256 0-255 3D tensor
+            const readyfied = tf.image
+              .resizeBilinear(myTensor, [256, 256], true)
+              .reshape([1, 256, 256, 3]);
+
+            const result = model.predict(readyfied);
+            // Model returns 4 corners of animal's face
+            result.print();
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
