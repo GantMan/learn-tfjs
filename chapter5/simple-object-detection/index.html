@@ -3,27 +3,46 @@
   <head>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.6.0/dist/tf.min.js"></script>
   </head>
-  <body>
-    <h1>Console Log for Result</h1>
-    <img id="mystery" src="/dog2.jpg" width="100%" />
+  <body style="margin: 0;">
+    <img id="mystery" src="/dog.jpg" width="512"  />
+    <canvas
+      className="size"
+      id="detection"
+      style="position: fixed; top: 0; left: 0;"
+    />
     <script>
       tf.ready().then(() => {
-        const modelPath =
-          "https://s3.amazonaws.com/ir_public/ai/dnc_faces/tfjs_model/model.json";
+        const modelPath = "/model/tfjs_quant_uint8/model.json";
+
         tf.tidy(() => {
           tf.loadLayersModel(modelPath).then((model) => {
             const mysteryImage = document.getElementById("mystery");
             const myTensor = tf.browser.fromPixels(mysteryImage);
-            // Model expects 256x256 0-255 3D tensor
+            myTensor.print()
+            // Model expects 256x256 0-1 value 3D tensor
             const readyfied = tf.image
-              .resizeBilinear(myTensor, [256, 256], true)
+              .resizeNearestNeighbor(myTensor, [256, 256], true)
+              .div(255)
               .reshape([1, 256, 256, 3]);
 
             const result = model.predict(readyfied);
             // Model returns 4 corners of animal's face
             result.print();
+            box = result.dataSync()
+
+            // Draw box
+            const detection = document.getElementById("detection")
+            detection.width = mysteryImage.width
+            detection.height = mysteryImage.height
+            const width = (box[2] - box[0]) * mysteryImage.width
+            const height = (box[3] - box[1]) * mysteryImage.height
+            const ctx = detection.getContext("2d")
+            ctx.strokeStyle = '#0F0'
+            ctx.lineWidth = 4
+            ctx.strokeRect(box[0]*mysteryImage.width, box[1]*mysteryImage.height, width, height)
           });
         });
+
       });
     </script>
   </body>
