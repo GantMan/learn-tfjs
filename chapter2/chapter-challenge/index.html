@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"></script>
+    <script>
+      mobilenet.load().then(model => {
+        const img = document.getElementById('myImage');
+        // Classify the image
+        model.classify(img).then(predictions => {
+          console.log('Predictions: ', predictions);
+          // Was there a truck?
+          let foundATruck
+          predictions.forEach(p => {
+            foundATruck = foundATruck || p.className.includes("truck")
+          })
+          // TRUCK ALERT!
+          if (foundATruck) alert("TRUCK DETECTED!")
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Is this a truck?</h1>
+    <img id="myImage" src="truck.jpg" width="100%"></img>
+  </body>
+</html>
