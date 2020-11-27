@@ -24,13 +24,7 @@
         // SSD Mobilenet single batch
         const readyfied = tf.expandDims(myTensor, 0);
         const results = await model.executeAsync(readyfied);
-        // Get a clean tensor of indices
-        const { indices } = tf.topk(results[0].squeeze(), 1);
-        // Move results back into JavaScript in parallel
-        const [detections, boxes] = await Promise.all([
-          indices.array(),
-          results[1].squeeze().array(),
-        ]);
+        const boxes = await results[1].squeeze().array();
 
         // Prep Canvas
         const detection = document.getElementById("detection");
@@ -40,19 +34,15 @@
         detection.width = imgWidth;
         detection.height = imgHeight;
 
-        detections.forEach(
-          (detection, idx) => {
-            // if (idx < 10) {
-            ctx.strokeStyle = "#0F0";
-            ctx.lineWidth = 1;
-            const startX = boxes[idx][0] * imgWidth;
-            const startY = boxes[idx][1] * imgHeight;
-            const width = (boxes[idx][2] - boxes[idx][0]) * imgWidth;
-            const height = (boxes[idx][3] - boxes[idx][1]) * imgHeight;
-            ctx.strokeRect(startX, startY, width, height);
-          }
-          // }
-        );
+        boxes.forEach((box, idx) => {
+          ctx.strokeStyle = "#0F0";
+          ctx.lineWidth = 1;
+          const startX = box[0] * imgWidth;
+          const startY = box[1] * imgHeight;
+          const width = (box[2] - box[0]) * imgWidth;
+          const height = (box[3] - box[1]) * imgHeight;
+          ctx.strokeRect(startX, startY, width, height);
+        });
       }
 
       performDetections();
