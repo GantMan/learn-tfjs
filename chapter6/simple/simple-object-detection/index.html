@@ -78,6 +78,7 @@
         chosen.forEach((detection) => {
           ctx.strokeStyle = "#0F0";
           ctx.lineWidth = 4;
+          ctx.globalCompositeOperation='destination-over';
           const detectedIndex = maxIndices[detection];
           const detectedClass = CLASSES[detectedIndex];
           const detectedScore = scores[detection];
@@ -90,6 +91,7 @@
           const width = (dBox[3] - dBox[1]) * imgWidth;
           ctx.strokeRect(startX, startY, width, height);
           // Draw the label background.
+          ctx.globalCompositeOperation='source-over';
           ctx.fillStyle = "#0B0";
           const textHeight = 16;
           const textPad = 4;
