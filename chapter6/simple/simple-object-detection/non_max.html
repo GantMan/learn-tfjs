@@ -54,7 +54,7 @@
           maxBoxes,
           iouThreshold,
           detectionThreshold,
-          1 // 0 is normal NMS, 1 is Soft-NMS for overlapping support
+          1 // 0 is normal NMS, 1 is max Soft-NMS for overlapping support
         );
 
         const chosen = await nmsDetections.selectedIndices.data();
