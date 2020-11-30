@@ -1,0 +1,25 @@
+{
+  "name": "simple-npm-example",
+  "version": "1.0.0",
+  "description": "Showing what an NPM version would look like",
+  "main": "index.html",
+  "scripts": {
+    "start": "parcel index.html --open",
+    "build": "parcel build index.html"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "2.7.0",
+    "core-js": "^3.8.0",
+    "regenerator-runtime": "^0.13.7"
+  },
+  "devDependencies": {
+    "@babel/core": "7.2.0",
+    "parcel-bundler": "^1.6.1",
+    "parcel-plugin-static-files-copy": "^2.5.0"
+  },
+  "keywords": [
+    "TensorFlow.js"
+  ],
+  "author": "Gant Laborde",
+  "license": "UNLICENSED"
+}
