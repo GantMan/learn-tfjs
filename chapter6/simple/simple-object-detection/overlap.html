@@ -36,6 +36,8 @@
         const maxBoxes = 20;
         const threshold = 0.3;
         const prominentDetection = tf.topk(results[0]);
+        prominentDetection.indices.print()
+        prominentDetection.values.print()
         const topvals = prominentDetection.values.squeeze();
         const topDetections = tf.topk(topvals, maxBoxes);
 
