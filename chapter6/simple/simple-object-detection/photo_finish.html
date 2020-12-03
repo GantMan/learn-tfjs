@@ -6,63 +6,29 @@
   <body>
     <h1>AI Sees You!</h1>
     <div style="position: relative; height: 80vh">
-      <video id="mystery" height="100%" autoplay></video>
+      <img id="mystery" src="/dinner.jpg" height="100%" />
       <canvas id="detection" style="position: absolute; left: 0" />
     </div>
 
     <script type="module">
       import { CLASSES } from "./labels.js";
 
-      async function setupWebcam(videoRef) {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          const webcamStream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: {
-              facingMode: "user",
-            },
-          });
-
-          if ("srcObject" in videoRef) {
-            videoRef.srcObject = webcamStream;
-          } else {
-            videoRef.src = window.URL.createObjectURL(webcamStream);
-          }
-
-          return new Promise((resolve, _) => {
-            videoRef.onloadedmetadata = () => {
-              resolve();
-            };
-          });
-        } else {
-          alert("No webcam - sorry!");
-        }
-      }
-
-      async function loadModel() {
+      async function performDetections() {
         await tf.ready();
         const modelPath =
           "https://tfhub.dev/tensorflow/tfjs-model/ssd_mobilenet_v2/1/default/1";
 
-        return await tf.loadGraphModel(modelPath, { fromTFHub: true });
-      }
-
-      async function doStuff() {
-        const model = await loadModel();
-        const mysteryVideo = document.getElementById("mystery");
-        await setupWebcam(mysteryVideo);
-        performDetections(model, mysteryVideo);
-      }
-
-      async function performDetections(model, videoRef) {
-        const myTensor = tf.browser.fromPixels(videoRef);
+        const model = await tf.loadGraphModel(modelPath, { fromTFHub: true });
+        const mysteryImage = document.getElementById("mystery");
+        const myTensor = tf.browser.fromPixels(mysteryImage);
         // SSD Mobilenet single batch
         const readyfied = tf.expandDims(myTensor, 0);
         const results = await model.executeAsync(readyfied);
         // Prep Canvas
         const detection = document.getElementById("detection");
         const ctx = detection.getContext("2d");
-        const imgWidth = videoRef.videoWidth;
-        const imgHeight = videoRef.videoHeight;
+        const imgWidth = mysteryImage.width;
+        const imgHeight = mysteryImage.height;
         detection.width = imgWidth;
         detection.height = imgHeight;
         ctx.font = "16px sans-serif";
@@ -94,7 +60,6 @@
         );
 
         const chosen = await nmsDetections.selectedIndices.data();
-        console.log("the chosen", chosen);
         // Mega Clean
         tf.dispose([
           results[0],
@@ -110,12 +75,10 @@
           justValues,
         ]);
 
-        // clear everything
-        // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         chosen.forEach((detection) => {
           ctx.strokeStyle = "#0F0";
           ctx.lineWidth = 4;
-          ctx.globalCompositeOperation = "destination-over";
+          ctx.globalCompositeOperation='destination-over';
           const detectedIndex = maxIndices[detection];
           const detectedClass = CLASSES[detectedIndex];
           const detectedScore = scores[detection];
@@ -128,7 +91,7 @@
           const width = (dBox[3] - dBox[1]) * imgWidth;
           ctx.strokeRect(startX, startY, width, height);
           // Draw the label background.
-          ctx.globalCompositeOperation = "source-over";
+          ctx.globalCompositeOperation='source-over';
           ctx.fillStyle = "#0B0";
           const textHeight = 16;
           const textPad = 4;
@@ -148,7 +111,7 @@
         console.log("Tensor Memory Status:", tf.memory().numTensors);
       }
 
-      doStuff();
+      performDetections();
     </script>
   </body>
 </html>
