@@ -30,7 +30,16 @@
 
           return new Promise((resolve, _) => {
             videoRef.onloadedmetadata = () => {
-              resolve();
+        // Prep Canvas
+        const detection = document.getElementById("detection");
+        const ctx = detection.getContext("2d");
+        const imgWidth = videoRef.clientWidth;
+        const imgHeight = videoRef.clientHeight;
+        detection.width = imgWidth;
+        detection.height = imgHeight;
+        ctx.font = "16px sans-serif";
+        ctx.textBaseline = "top";
+              resolve([ctx, imgHeight, imgWidth]);
             };
           });
         } else {
@@ -47,26 +56,23 @@
       }
 
       async function doStuff() {
-        const model = await loadModel();
-        const mysteryVideo = document.getElementById("mystery");
-        await setupWebcam(mysteryVideo);
-        performDetections(model, mysteryVideo);
+        try {
+          const model = await loadModel();
+          const mysteryVideo = document.getElementById("mystery");
+          const camDetails = await setupWebcam(mysteryVideo);
+          performDetections(model, mysteryVideo, camDetails);
+        } catch (e) {
+          console.error(e)
+        }
       }
 
-      async function performDetections(model, videoRef) {
+      async function performDetections(model, videoRef, camDetails) {
+        const [ctx, imgHeight, imgWidth] = camDetails
         const myTensor = tf.browser.fromPixels(videoRef);
         // SSD Mobilenet single batch
         const readyfied = tf.expandDims(myTensor, 0);
         const results = await model.executeAsync(readyfied);
-        // Prep Canvas
-        const detection = document.getElementById("detection");
-        const ctx = detection.getContext("2d");
-        const imgWidth = videoRef.videoWidth;
-        const imgHeight = videoRef.videoHeight;
-        detection.width = imgWidth;
-        detection.height = imgHeight;
-        ctx.font = "16px sans-serif";
-        ctx.textBaseline = "top";
+
 
         // Get a clean tensor of top indices
         const detectionThreshold = 0.4;
@@ -145,7 +151,7 @@
           ctx.fillText(label, startX, startY);
         });
 
-        console.log("Tensor Memory Status:", tf.memory().numTensors);
+        // console.log("Tensor Memory Status:", tf.memory().numTensors);
       }
 
       doStuff();
