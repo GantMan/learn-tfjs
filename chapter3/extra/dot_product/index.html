@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/jsxgraphcore.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.1.0/jsxgraph.css"
+    />
+  </head>
+  <body>
+    <div id="jxgbox" class="jxgbox" style="width: 500px; height: 500px"></div>
+    <div id="out">
+      <h2>Dot Product = 66.00</h2>
+    </div>
+  </body>
+  <script>
+    const b = JXG.JSXGraph.initBoard("jxgbox", {
+      boundingbox: [-15, 15, 15, -15],
+      axis: true,
+    });
+
+    const p1 = b.create("point", [-6, 8], {
+      name: "A",
+      size: 0,
+    });
+    const p2 = b.create("point", [0, 0], {
+      name: "",
+      size: 4,
+      fixed: true,
+    });
+    const p3 = b.create("point", [5, 12], {
+      name: "B",
+      size: 0,
+    });
+
+    const li1 = b.create("line", [p1, p2], {
+      straightFirst: false,
+      straightLast: false,
+      strokeWidth: 2,
+      dash: 2,
+      firstArrow: true,
+    });
+
+    const li2 = b.create("line", [p3, p2], {
+      straightFirst: false,
+      straightLast: false,
+      strokeWidth: 2,
+      dash: 2,
+      firstArrow: true,
+      strokeColor: "green",
+    });
+
+    b.on("update", function () {
+      const dotproduct = (p1.X() * p3.X() + p1.Y() * p3.Y()).toFixed(2);
+      document.getElementById("out").innerHTML =
+        "<h2>Dot Product = " + dotproduct + "</h2>";
+    });
+  </script>
+</html>
