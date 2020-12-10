@@ -1,4 +1,6 @@
 import * as tf from "@tensorflow/tfjs";
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 
 async function trainUp() {
   const jsxs = [];

@@ -8,7 +8,9 @@
     "build": "parcel build index.html"
   },
   "dependencies": {
-    "@tensorflow/tfjs": "2.1.0"
+    "@tensorflow/tfjs": "2.1.0",
+    "core-js": "^3.8.1",
+    "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
     "@babel/core": "7.2.0",
