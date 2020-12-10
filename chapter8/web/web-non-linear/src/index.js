@@ -1,0 +1,74 @@
+import * as tf from "@tensorflow/tfjs";
+
+async function trainUp() {
+  const jsxs = [];
+  const jsys = [];
+
+  // Create the dataset
+  const dataSize = 10;
+  const stepSize = 0.001;
+  for (let i = 0; i < dataSize; i = i + stepSize) {
+    jsxs.push(i);
+    jsys.push(i * i);
+  }
+  // Inputs
+  const xs = tf.tensor(jsxs);
+  // Answers we want from inputs
+  const ys = tf.tensor(jsys);
+
+  // Print the progress on each epoch
+  const printCallback = {
+    onEpochEnd: (epoch, log) => {
+      console.log(epoch, log);
+    },
+  };
+
+  // Create the model
+  const model = tf.sequential();
+  model.add(
+    tf.layers.dense({
+      inputShape: 1,
+      units: 20,
+      activation: "relu",
+    })
+  );
+  model.add(
+    tf.layers.dense({
+      units: 20,
+      activation: "relu",
+    })
+  );
+  model.add(
+    tf.layers.dense({
+      units: 1,
+    })
+  );
+
+  // Compile for training
+  model.compile({
+    optimizer: "adam",
+    loss: "meanSquaredError",
+  });
+
+  // Train and print timing
+  console.time("Training");
+  await model.fit(xs, ys, {
+    epochs: 30,
+    callbacks: printCallback,
+    batchSize: 64,
+  });
+  console.timeEnd("Training");
+
+  // evaluate the model
+  const next = tf.tensor([7]);
+  const answer = model.predict(next);
+  answer.print();
+
+  // Cleanup!
+  answer.dispose();
+  xs.dispose();
+  ys.dispose();
+  model.dispose();
+}
+
+trainUp();

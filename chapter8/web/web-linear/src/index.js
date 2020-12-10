@@ -1,0 +1,33 @@
+import * as tf from "@tensorflow/tfjs";
+
+// Inputs
+const xs = tf.tensor([-1, 0, 1, 2, 3, 4]);
+// Answers we want from inputs
+const ys = tf.tensor([-4, -2, 0, 2, 4, 6]);
+
+// Create a model
+const model = tf.sequential();
+
+model.add(
+  tf.layers.dense({
+    inputShape: 1,
+    units: 1,
+  })
+);
+
+model.compile({
+  optimizer: "sgd",
+  loss: "meanSquaredError",
+});
+
+// Print out the model structure
+model.summary();
+
+// Train
+model.fit(xs, ys, { epochs: 300 }).then((history) => {
+  const inputTensor = tf.tensor([10]);
+  const answer = model.predict(inputTensor);
+  console.log(`10 results in ${Math.round(answer.dataSync())}`);
+  // cleanup
+  tf.dispose([xs, ys, model, answer, inputTensor]);
+});
