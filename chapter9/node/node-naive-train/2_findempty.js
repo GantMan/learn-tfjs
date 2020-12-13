@@ -1,7 +1,7 @@
 const dfd = require("danfojs-node");
 
-async function prepareData() {
-  const df = await dfd.read_csv("file://../extra/titanic data/train.csv");
+async function checkEmpties() {
+  const df = await dfd.read_csv("file://../../extra/titanic data/train.csv");
   // Count of empty spots
   empty_spots = df.isna().sum();
   empty_spots.print();
@@ -9,4 +9,5 @@ async function prepareData() {
   empty_rate.print();
 }
 
-prepareData();
+// Demonstrate
+checkEmpties();
