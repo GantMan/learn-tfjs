@@ -27,14 +27,6 @@ async function cleanData() {
   onlyFull['Embarked'] = encode.transform(onlyFull['Embarked'].values)
   onlyFull.head().print()
 
-  // // Handle person sex - convert to one-hot
-  // const sexOneHot = dfd.get_dummies(onlyFull["Sex"]);
-  // sexOneHot.head().print();
-  // // Swap one column for two
-  // console.log(`Before shape ${onlyFull.shape}`);
-  // onlyFull.drop({ columns: ["Sex"], axis: 1, inplace: true });
-  // onlyFull.addColumn({ column: "male", value: sexOneHot["male"] });
-  // onlyFull.addColumn({ column: "female", value: sexOneHot["female"] });
   encode.fit(onlyFull['Sex'])
   onlyFull['Sex'] = encode.transform(onlyFull['Sex'].values)
 
