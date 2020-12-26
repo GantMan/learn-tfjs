@@ -11,13 +11,8 @@ async function justWrite() {
   scaledData.head().print()
 
   // Write the CSV files
-  const featuredString = await scaledData.to_csv()
-
-  fs.writeFile(
-    '../../extra/featured/titanic.csv',
-    featuredString,
-    (err) => err && console.error(err)
-  )
+  await scaledData.to_csv('../../extra/featured/titanic.csv')
+  console.log('Featured file written')
 }
 
 // Demonstrate

@@ -1,5 +1,4 @@
 const dfd = require('danfojs-node')
-const fs = require('fs')
 const prep = require('./4_clean')
 
 async function splitWrite() {
@@ -14,18 +13,9 @@ async function splitWrite() {
   console.log(`newTest row count: ${newTest.shape[0]}`)
 
   // Write the CSV files
-  const trainString = await newTrain.to_csv()
-  const testString = await newTest.to_csv()
-  fs.writeFile(
-    '../../extra/cleaned/newTrain.csv',
-    trainString,
-    (err) => err && console.error(err)
-  )
-  fs.writeFile(
-    '../../extra/cleaned/newTest.csv',
-    testString,
-    (err) => err && console.error(err)
-  )
+  await newTrain.to_csv('../../extra/cleaned/newTrain.csv')
+  await newTest.to_csv('../../extra/cleaned/newTest.csv')
+  console.log('Files written!')
 }
 
 // Demonstrate
