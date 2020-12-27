@@ -19,6 +19,27 @@ function encodeDir(filePath) {
   process.exit(1)
 }
 
+function shuffleCombo(array, array2) {
+  let counter = array.length
+  console.assert(array.length === array2.length)
+  let temp, temp2
+  let index = 0
+  // While there are elements in the array
+  while (counter > 0) {
+    // Pick a random index
+    index = (Math.random() * counter) | 0
+    // Decrease counter by 1
+    counter--
+    // And swap the last element with it
+    temp = array[counter]
+    temp2 = array2[counter]
+    array[counter] = array[index]
+    array2[counter] = array2[index]
+    array[index] = temp
+    array2[index] = temp2
+  }
+}
+
 export function folderToTensors() {
   return new Promise((resolve, reject) => {
     const FILE_PATH = 'files'
@@ -47,6 +68,9 @@ export function folderToTensors() {
         YS.push(answer)
         XS.push(imageTensor)
       })
+
+      // Shuffle the data (keep XS[n] === YS[n])
+      shuffleCombo(XS, YS)
 
       // Stack values
       console.log('Stacking')
