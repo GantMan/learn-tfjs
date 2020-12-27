@@ -115,13 +115,13 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-src/bird/
-src/lion/
-src/owl/
-src/parrot/
-src/raccoon/
-src/skull/
-src/snail/
-src/snake/
-src/squirrel/
-src/tiger/
+files/bird/
+files/lion/
+files/owl/
+files/parrot/
+files/raccoon/
+files/skull/
+files/snail/
+files/snake/
+files/squirrel/
+files/tiger/
