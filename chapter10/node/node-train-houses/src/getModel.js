@@ -8,10 +8,10 @@ export default function getModel() {
     tf.layers.conv2d({
       filters: 16,
       kernelSize: 3,
-      // strides: 1,
+      strides: 1,
       padding: 'same',
       activation: 'relu',
-      kernelInitializer: 'heNormal',
+      // kernelInitializer: 'heNormal',
       inputShape: [28, 28, 1],
     })
   )

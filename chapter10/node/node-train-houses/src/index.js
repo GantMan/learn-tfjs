@@ -15,7 +15,7 @@ async function doTraining() {
       batchSize: 256,
       validationSplit: 0.1,
       epochs: 20,
-      // shuffle: true,
+      shuffle: true,
     })
 
     // Cleanup!

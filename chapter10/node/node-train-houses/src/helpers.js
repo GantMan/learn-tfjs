@@ -13,6 +13,10 @@ function encodeDir(filePath) {
   if (filePath.includes('snake')) return 7
   if (filePath.includes('squirrel')) return 8
   if (filePath.includes('tiger')) return 9
+
+  // Should never get here
+  console.error('Unrecognized folder')
+  process.exit(1)
 }
 
 export function folderToTensors() {
@@ -53,10 +57,12 @@ export function folderToTensors() {
       console.log('X', X.shape)
       console.log('Y', Y.shape)
 
+      // Normalize X to values 0 - 1
+      const XNORM = X.div(255)
       // cleanup
-      tf.dispose([XS])
+      tf.dispose([XS, X])
 
-      resolve([X, Y])
+      resolve([XNORM, Y])
     })
   })
 }
