@@ -1,4 +1,5 @@
 import * as tf from '@tensorflow/tfjs-node'
+// import * as tf from '@tensorflow/tfjs-node-gpu'
 
 export default function getModel() {
   const model = tf.sequential()
@@ -11,7 +12,7 @@ export default function getModel() {
       strides: 1,
       padding: 'same',
       activation: 'relu',
-      // kernelInitializer: 'heNormal',
+      kernelInitializer: 'heNormal',
       inputShape: [28, 28, 1],
     })
   )

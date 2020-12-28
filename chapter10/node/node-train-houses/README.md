@@ -1,3 +1,3 @@
-# Data 
+# Data
 
-To get the data ready for training, unzip the image zip files in the src folder.
+To get the data ready for training, unzip the zip in the `files` folder.

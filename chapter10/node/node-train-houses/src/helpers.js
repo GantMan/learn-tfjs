@@ -1,4 +1,5 @@
 import * as tf from '@tensorflow/tfjs-node'
+// import * as tf from '@tensorflow/tfjs-node-gpu'
 import * as fs from 'fs'
 import { default as glob } from 'glob'
 
@@ -89,4 +90,25 @@ export function folderToTensors() {
       resolve([XNORM, Y])
     })
   })
+}
+
+function printSign(val) {
+  console.log(`
+  ╔════════════╗
+  ║   SAVING   ║
+  ║   %${(val * 100).toFixed(2)}   ║
+  ╚════════════╝
+  `)
+}
+
+export async function bestValidationSave(model, savePath, best) {
+  return {
+    onEpochEnd: async (_epoch, logs) => {
+      if (logs.val_acc > best) {
+        printSign(logs.val_acc)
+        model.save(savePath)
+        best = logs.val_acc
+      }
+    },
+  }
 }
