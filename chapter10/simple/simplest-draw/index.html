@@ -1,13 +1,49 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="mystyle.css">
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
     <script>
-      function loaded() {
+      function displayResults(predictions) {
+        // Get Scores
+        const ravenclaw = predictions[0] + predictions[2] + predictions[3]
+        const gryffindor = predictions[1] + predictions[9]
+        const hufflepuff = predictions[4] + predictions[8]
+        const slytherin = predictions[6] + predictions[7]
+        const deatheater = predictions[5]
+
+        document.getElementById("ravenclaw").style.opacity = ravenclaw
+        document.getElementById("gryffindor").style.opacity = gryffindor
+        document.getElementById("hufflepuff").style.opacity = hufflepuff
+        document.getElementById("slytherin").style.opacity = slytherin
+
+        // Cute
+        if (deatheater > 0.9) {
+          alert('DEATH EATER DETECTED!!!')
+        }
+      }
+
+      async function makePrediction(canvas, model) {
+        const drawTensor = tf.browser.fromPixels(canvas, 1)
+        const resize = tf.image.resizeNearestNeighbor(drawTensor, [28,28], true)
+
+        const batched = resize.expandDims()
+        const results = await model.predict(resize.expandDims())
+        const predictions = await results.array()
+
+        // Display
+        displayResults(predictions[0])
+        // Cleanup
+        tf.dispose([drawTensor, resize, batched, results])
+      }
+
+      async function loaded() {
+        // load model
+        const model = await tf.loadLayersModel('sorting_hat/model.json')
         // get the canvas element and its context
         const canvas = document.getElementById('sketchpad')
         const context = canvas.getContext('2d')
-        context.lineWidth = 10
+        context.lineWidth = 14
         context.lineCap = 'round'
         let isIdle = true
 
@@ -31,6 +67,7 @@
           if (isIdle) return
           drawmove(event)
           isIdle = true
+          makePrediction(canvas, model)
         }
         function touchstart(event) {
           drawstart(event.touches[0])
@@ -43,6 +80,14 @@
           drawend(event.changedTouches[0])
         }
 
+        function clean() {
+          context.beginPath();
+          context.rect(0, 0, canvas.clientWidth, canvas.clientHeight);
+          context.fillStyle = "#fff";
+          context.fill();       
+          displayResults(new Array(10).fill(0))   
+        }
+
         canvas.addEventListener('touchstart', touchstart, false)
         canvas.addEventListener('touchmove', touchmove, false)
         canvas.addEventListener('touchend', touchend, false)
@@ -50,24 +95,41 @@
         canvas.addEventListener('mousedown', drawstart, false)
         canvas.addEventListener('mousemove', drawmove, false)
         canvas.addEventListener('mouseup', drawend, false)
+        document.getElementById('clear').onclick = clean
 
-        const clearBtn = document.getElementById('clear')
-
-        clearBtn.onclick = () => {
-          context.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
-        }
+        // Prep canvas 
+        clean()
       }
     </script>
   </head>
   <body onload="loaded()">
-    <h1>Get Sorted</h1>
-    <button style="display: flex" id="clear">Clear</button>
-    <canvas
-      id="sketchpad"
-      onSelectStart="this.style.cursor='crosshair'; return false;"
-      width="500"
-      height="500"
-      style="border: 1px solid #777"
-    />
+    <h1>A Riddikulus Sort</h1>
+    <div class="container">
+      <div id="drawspace">
+        <button style="display: flex" id="clear">Clear</button>
+        <canvas
+          id="sketchpad"
+          onSelectStart="this.style.cursor='crosshair'; return false;"
+          width="500"
+          height="500"
+          style="border: 1px solid #777"
+        />
+      </div>
+      <div class="results">
+        Sort Results
+        <div class="result" id="ravenclaw">
+          Ravenclaw  
+        </div>
+        <div class="result" id="gryffindor">
+          Gryffindor  
+        </div>
+        <div class="result" id="hufflepuff">
+          Hufflepuff
+        </div>
+        <div class="result" id="slytherin">
+          Slytherin  
+        </div>                        
+      </div>
+    </div>
   </body>
 </html>
