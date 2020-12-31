@@ -28,7 +28,7 @@
         const resize = tf.image.resizeNearestNeighbor(drawTensor, [28,28], true)
 
         const batched = resize.expandDims()
-        const results = await model.predict(resize.expandDims())
+        const results = await model.predict(batched)
         const predictions = await results.array()
 
         // Display
@@ -47,7 +47,7 @@
         context.lineCap = 'round'
         let isIdle = true
 
-        function drawstart(event) {
+        function drawStart(event) {
           context.beginPath()
           context.moveTo(
             event.pageX - canvas.offsetLeft,
@@ -55,7 +55,7 @@
           )
           isIdle = false
         }
-        function drawmove(event) {
+        function drawMove(event) {
           if (isIdle) return
           context.lineTo(
             event.pageX - canvas.offsetLeft,
@@ -63,38 +63,34 @@
           )
           context.stroke()
         }
-        function drawend(event) {
-          if (isIdle) return
-          drawmove(event)
+        function drawEnd(event) {
           isIdle = true
           makePrediction(canvas, model)
         }
-        function touchstart(event) {
-          drawstart(event.touches[0])
+        function touchStart(event) {
+          drawStart(event.touches[0])
         }
-        function touchmove(event) {
-          drawmove(event.touches[0])
+        function touchMove(event) {
+          drawMove(event.touches[0])
           event.preventDefault()
         }
-        function touchend(event) {
-          drawend(event.changedTouches[0])
+        function touchEnd(event) {
+          drawEnd(event.changedTouches[0])
         }
 
         function clean() {
-          context.beginPath();
-          context.rect(0, 0, canvas.clientWidth, canvas.clientHeight);
-          context.fillStyle = "#fff";
-          context.fill();       
+          context.fillStyle = "#fff";     
+          context.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
           displayResults(new Array(10).fill(0))   
         }
 
-        canvas.addEventListener('touchstart', touchstart, false)
-        canvas.addEventListener('touchmove', touchmove, false)
-        canvas.addEventListener('touchend', touchend, false)
+        canvas.addEventListener('touchstart', touchStart, false)
+        canvas.addEventListener('touchmove', touchMove, false)
+        canvas.addEventListener('touchend', touchEnd, false)
 
-        canvas.addEventListener('mousedown', drawstart, false)
-        canvas.addEventListener('mousemove', drawmove, false)
-        canvas.addEventListener('mouseup', drawend, false)
+        canvas.addEventListener('mousedown', drawStart, false)
+        canvas.addEventListener('mousemove', drawMove, false)
+        canvas.addEventListener('mouseup', drawEnd, false)
         document.getElementById('clear').onclick = clean
 
         // Prep canvas 
