@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.8.2/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@0.1.2/dist/index.min.js"></script>
+    <script>
+      tf.ready().then(async () => {
+        const dfy = await dfd.read_csv("https://raw.githubusercontent.com/GantMan/transfer_trek/main/convert-to-csvs/labels.csv");
+        const dfx = await dfd.read_csv("https://raw.githubusercontent.com/GantMan/transfer_trek/main/convert-to-csvs/images.csv");
+      
+        const Y = dfy.tensor
+        const X = dfx.tensor.reshape([dfx.shape[0], 28, 28, 1])
+
+        console.log('Y is ready ', Y.shape)
+        console.log('X is ready ', X.shape)
+      })
+    </script>
+  </head>
+  <body>
+    <h1>Yay</h1>
+  </body>
+</html>
