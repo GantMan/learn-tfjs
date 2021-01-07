@@ -1,0 +1,46 @@
+.container {
+  display: flex;
+}
+
+#drawspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.results {
+  display: flex;
+  flex: 1;
+  flex-direction: column;  
+}
+
+.result {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  background-color: beige;
+  justify-content: center;
+  align-items: center;
+  font-size: 2em;
+}
+
+#ravenclaw {
+  background-color: #0e1a40;
+  color: white;
+}
+
+#gryffindor {
+  background-color: #740001;
+  color: white;
+}
+
+#hufflepuff {
+  background-color: #ecb939;
+  color: black;
+}
+
+#slytherin {
+  background-color: #1a472a;
+  color: white;
+}

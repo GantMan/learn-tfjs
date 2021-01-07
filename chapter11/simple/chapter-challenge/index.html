@@ -1,22 +1,69 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.8.2/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/danfojs@0.1.2/dist/index.min.js"></script>
     <script>
       tf.ready().then(async () => {
-        const dfy = await dfd.read_csv("https://raw.githubusercontent.com/GantMan/transfer_trek/main/convert-to-csvs/labels.csv");
-        const dfx = await dfd.read_csv("https://raw.githubusercontent.com/GantMan/transfer_trek/main/convert-to-csvs/images.csv");
-      
+        /* --------------------------------/
+         * 1. Load new labeled data
+         *--------------------------------*/
+        const dfy = await dfd.read_csv('labels.csv')
+        const dfx = await dfd.read_csv('images.csv')
+
         const Y = dfy.tensor
         const X = dfx.tensor.reshape([dfx.shape[0], 28, 28, 1])
 
         console.log('Y is ready ', Y.shape)
         console.log('X is ready ', X.shape)
+
+        /* ---------------------------------------------/
+         * 2. Load original model and create features
+         *---------------------------------------------*/
+        const model = await tf.loadLayersModel('sorting_hat/model.json')
+        model.summary()
+        // Gonna shave off
+        const layer = model.getLayer('max_pooling2d_MaxPooling2D3')
+        const shaved = tf.model({ inputs: model.inputs, outputs: layer.output })
+        shaved.summary()
+        // Run data through shaved model to get features
+        const XFEATURES = shaved.predict(X)
+        console.log('Images have been featurized')
+        console.log('XFEATURES', XFEATURES.shape)
+
+        /* ---------------------------------------------/
+         * 3. Create a new model that trains on features
+         *---------------------------------------------*/
+        transferModel = tf.sequential({
+          layers: [
+            tf.layers.flatten({ inputShape: shaved.outputs[0].shape.slice(1) }),
+            tf.layers.dense({ units: 128, activation: 'relu' }),
+            tf.layers.dense({ units: 3, activation: 'softmax' }),
+          ],
+        })
+        transferModel.compile({
+          optimizer: 'adam',
+          shuffle: true,
+          loss: 'categoricalCrossentropy',
+          metrics: ['accuracy'],
+        })
+        transferModel.summary()
+
+        /* ---------------------------------------------/
+         * 4. Transfer learn!
+         *---------------------------------------------*/
+        await transferModel.fit(XFEATURES, Y, {
+          epochs: 10,
+          validationSplit: 0.1,
+          callbacks: {
+            onEpochEnd: console.log,
+          },
+        })
       })
     </script>
   </head>
   <body>
-    <h1>Yay</h1>
+    <h1>Transfer Learning</h1>
+    <h2>View Console Logs</h2>
   </body>
 </html>

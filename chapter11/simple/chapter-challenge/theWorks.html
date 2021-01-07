@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="mystyle.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@0.1.2/dist/index.min.js"></script>
+    <script>
+      tf.ready().then(async () => {
+        /* --------------------------------/
+         * 1. Load new labeled data
+         *--------------------------------*/
+        const dfy = await dfd.read_csv('labels.csv')
+        const dfx = await dfd.read_csv('images.csv')
+
+        const Y = dfy.tensor
+        const X = dfx.tensor.reshape([dfx.shape[0], 28, 28, 1])
+
+        console.log('Y is ready ', Y.shape)
+        console.log('X is ready ', X.shape)
+
+        /* ---------------------------------------------/
+         * 2. Load original model and create features
+         *---------------------------------------------*/
+        const model = await tf.loadLayersModel('sorting_hat/model.json')
+        model.summary()
+        // Gonna shave off
+        const layer = model.getLayer('max_pooling2d_MaxPooling2D3')
+        const shaved = tf.model({ inputs: model.inputs, outputs: layer.output })
+        shaved.summary()
+        // Run data through shaved model to get features
+        const XFEATURES = shaved.predict(X)
+        console.log('Images have been featurized')
+        console.log('XFEATURES', XFEATURES.shape)
+
+        /* ---------------------------------------------/
+         * 3. Create a new model that trains on features
+         *---------------------------------------------*/
+        transferModel = tf.sequential({
+          layers: [
+            tf.layers.flatten({ inputShape: shaved.outputs[0].shape.slice(1) }),
+            tf.layers.dense({ units: 128, activation: 'relu' }),
+            tf.layers.dense({ units: 3, activation: 'softmax' }),
+          ],
+        })
+        transferModel.compile({
+          optimizer: 'adam',
+          shuffle: true,
+          loss: 'categoricalCrossentropy',
+          metrics: ['accuracy'],
+        })
+        transferModel.summary()
+
+        /* ---------------------------------------------/
+         * 4. Transfer learn!
+         *---------------------------------------------*/
+        await transferModel.fit(XFEATURES, Y, {
+          epochs: 10,
+          validationSplit: 0.1,
+          callbacks: {
+            onEpochEnd: console.log,
+          },
+        })
+        // store it
+        window.shaved = shaved
+        window.transferModel = transferModel
+      })
+
+      function displayResults(predictions) {
+        document.getElementById('ferengi').style.opacity = predictions[0]
+        document.getElementById('klingon').style.opacity = predictions[1]
+        document.getElementById('starfleet').style.opacity = predictions[2]
+      }
+
+      async function makePrediction(canvas, model) {
+        const drawTensor = tf.browser.fromPixels(canvas, 1)
+        const resize = tf.image.resizeNearestNeighbor(
+          drawTensor,
+          [28, 28],
+          true
+        )
+
+        const batched = resize.expandDims()
+        const resultFeatures = await window.shaved.predict(batched)
+        const results = await window.transferModel.predict(resultFeatures)
+        const predictions = await results.array()
+
+        // Display
+        displayResults(predictions[0])
+        // Cleanup
+        tf.dispose([drawTensor, resize, batched, results, resultFeatures])
+      }
+
+      async function loaded() {
+        // load model
+        const model = await tf.loadLayersModel('sorting_hat/model.json')
+        // get the canvas element and its context
+        const canvas = document.getElementById('sketchpad')
+        const context = canvas.getContext('2d')
+        context.lineWidth = 14
+        context.lineCap = 'round'
+        let isIdle = true
+
+        function drawStart(event) {
+          context.beginPath()
+          context.moveTo(
+            event.pageX - canvas.offsetLeft,
+            event.pageY - canvas.offsetTop
+          )
+          isIdle = false
+        }
+        function drawMove(event) {
+          if (isIdle) return
+          context.lineTo(
+            event.pageX - canvas.offsetLeft,
+            event.pageY - canvas.offsetTop
+          )
+          context.stroke()
+        }
+        function drawEnd(event) {
+          isIdle = true
+          makePrediction(canvas, model)
+        }
+        function touchStart(event) {
+          drawStart(event.touches[0])
+        }
+        function touchMove(event) {
+          drawMove(event.touches[0])
+          event.preventDefault()
+        }
+        function touchEnd(event) {
+          drawEnd(event.changedTouches[0])
+        }
+
+        function clean() {
+          context.fillStyle = '#fff'
+          context.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight)
+          displayResults(new Array(10).fill(1))
+        }
+
+        canvas.addEventListener('touchstart', touchStart, false)
+        canvas.addEventListener('touchmove', touchMove, false)
+        canvas.addEventListener('touchend', touchEnd, false)
+
+        canvas.addEventListener('mousedown', drawStart, false)
+        canvas.addEventListener('mousemove', drawMove, false)
+        canvas.addEventListener('mouseup', drawEnd, false)
+        document.getElementById('clear').onclick = clean
+
+        // Prep canvas
+        clean()
+      }
+    </script>
+  </head>
+  <body onload="loaded()">
+    <h1>Transfer Learning</h1>
+    <div id="drawspace">
+      <button style="display: flex" id="clear">Clear</button>
+      <canvas
+        id="sketchpad"
+        onSelectStart="this.style.cursor='crosshair'; return false;"
+        width="500"
+        height="500"
+        style="border: 1px solid #777"
+      />
+    </div>
+    <div class="results">
+      Results
+      <div class="result" id="starfleet">Starfleet</div>
+      <div class="result" id="klingon">Klingon</div>
+      <div class="result" id="ferengi">Ferengi</div>
+    </div>
+  </body>
+</html>
