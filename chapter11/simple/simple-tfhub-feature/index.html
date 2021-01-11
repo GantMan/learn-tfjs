@@ -4,21 +4,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
     <script src="https://unpkg.com/dogs-n-cats" type="text/javascript"></script>
     <script>
-
-      async function buildFeatureSet(DC, featureModel, batchSize = 100) {
+      async function buildFeatureSet(DC, featureModel, batchSize = 50) {
         const imageFeatures = []
         const answers = []
         const total = DC.training.length / batchSize
-        const imageSize = featureModel.inputs[0].shape.slice(1,3)
+        const imageSize = featureModel.inputs[0].shape.slice(1, 3)
 
         for (let i = 0; i < total; i++) {
-          console.log(`Featurizing Batch: ${i+1} of ${total}`)
+          console.log(`Featurizing Batch: ${i + 1} of ${total}`)
           const [trainFeatureX, trainY] = tf.tidy(() => {
-            const [trainX, trainY] = DC.training.get(batchSize);
+            const [trainX, trainY] = DC.training.get(batchSize)
             const floatX = trainX.asType('float32')
             const resizedTrainX = tf.image.resizeBilinear(floatX, imageSize)
-            const trainFeatureX = featureModel.predict(resizedTrainX)
-            return [trainFeatureX, trainY]
+            const doubledTrainX = resizedTrainX.concat(resizedTrainX.reverse(2))
+            const doubledTrainY = trainY.concat(trainY)
+            const trainFeatureX = featureModel.predict(doubledTrainX)
+            return [trainFeatureX, doubledTrainY]
           })
           imageFeatures.push(trainFeatureX)
           answers.push(trainY)
@@ -35,31 +36,40 @@
         // Load data
         const DC = await dogsncats.load()
         // Load feature model
-        const tfhubURL = "https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_130_224/feature_vector/3/default/1"
-        const featureModel = await tf.loadGraphModel(tfhubURL, { fromTFHub: true })
+        const tfhubURL =
+          'https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_130_224/feature_vector/3/default/1'
+        const featureModel = await tf.loadGraphModel(tfhubURL, {
+          fromTFHub: true,
+        })
         // Push data through feature detection
         const [featureX, Y] = await buildFeatureSet(DC, featureModel)
-        console.log(`Features stack ${featureX.shape} and answers stack ${Y.shape}`)
+        console.log(
+          `Features stack ${featureX.shape} and answers stack ${Y.shape}`
+        )
 
         const transferModel = tf.sequential({
           layers: [
-            tf.layers.dense({ inputShape: [featureX.shape[1]], units: 64, activation: 'relu'}),
-            tf.layers.dense({ units: 1, activation: 'sigmoid'})
-          ]
+            tf.layers.dense({
+              inputShape: [featureX.shape[1]],
+              units: 64,
+              kernelRegularizer: 'l1l2',
+              activation: 'relu',
+            }),
+            tf.layers.dense({ units: 1, activation: 'sigmoid' }),
+          ],
         })
 
         transferModel.compile({
           optimizer: 'adam',
           loss: 'binaryCrossentropy',
-          metrics: ['accuracy'],          
+          metrics: ['accuracy'],
         })
 
         const history = await transferModel.fit(featureX, Y, {
           validationSplit: 0.1,
-          epochs: 20,
-          callbacks: { onEpochEnd: console.log }
-        });        
-
+          epochs: 10,
+          callbacks: { onEpochEnd: console.log },
+        })
       }
 
       runIt()
