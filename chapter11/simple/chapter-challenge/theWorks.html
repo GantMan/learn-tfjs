@@ -44,7 +44,6 @@
         })
         transferModel.compile({
           optimizer: 'adam',
-          shuffle: true,
           loss: 'categoricalCrossentropy',
           metrics: ['accuracy'],
         })
@@ -55,6 +54,7 @@
          *---------------------------------------------*/
         await transferModel.fit(XFEATURES, Y, {
           epochs: 10,
+          shuffle: true,
           validationSplit: 0.1,
           callbacks: {
             onEpochEnd: console.log,
