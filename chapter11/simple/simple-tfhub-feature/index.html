@@ -2,44 +2,52 @@
 <html>
   <head>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
-    <script src="https://unpkg.com/dogs-n-cats" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@0.1.2/dist/index.min.js"></script>
     <script>
 
-      async function buildFeatureSet(DC, featureModel, batchSize = 100) {
-        const imageFeatures = []
-        const answers = []
-        const total = DC.training.length / batchSize
-        const imageSize = featureModel.inputs[0].shape.slice(1,3)
+      // async function buildFeatureSet(DC, featureModel, batchSize = 100) {
+      //   const imageFeatures = []
+      //   const answers = []
+      //   const total = DC.training.length / batchSize
+      //   const imageSize = featureModel.inputs[0].shape.slice(1,3)
 
-        for (let i = 0; i < total; i++) {
-          console.log(`Featurizing Batch: ${i+1} of ${total}`)
-          const [trainFeatureX, trainY] = tf.tidy(() => {
-            const [trainX, trainY] = DC.training.get(batchSize);
-            const floatX = trainX.asType('float32')
-            const resizedTrainX = tf.image.resizeBilinear(floatX, imageSize)
-            const trainFeatureX = featureModel.predict(resizedTrainX)
-            return [trainFeatureX, trainY]
-          })
-          imageFeatures.push(trainFeatureX)
-          answers.push(trainY)
-        }
+      //   for (let i = 0; i < total; i++) {
+      //     console.log(`Featurizing Batch: ${i+1} of ${total}`)
+      //     const [trainFeatureX, trainY] = tf.tidy(() => {
+      //       const [trainX, trainY] = DC.training.get(batchSize);
+      //       const floatX = trainX.asType('float32')
+      //       const resizedTrainX = tf.image.resizeBilinear(floatX, imageSize)
+      //       const trainFeatureX = featureModel.predict(resizedTrainX)
+      //       return [trainFeatureX, trainY]
+      //     })
+      //     imageFeatures.push(trainFeatureX)
+      //     answers.push(trainY)
+      //   }
 
-        console.log('Creating final features set')
-        const stackedFeatures = tf.concat(imageFeatures)
-        const stackedAnswers = tf.concat(answers)
-        tf.dispose([...imageFeatures, ...answers])
-        return [stackedFeatures, stackedAnswers]
-      }
+      //   console.log('Creating final features set')
+      //   const stackedFeatures = tf.concat(imageFeatures)
+      //   const stackedAnswers = tf.concat(answers)
+      //   tf.dispose([...imageFeatures, ...answers])
+      //   return [stackedFeatures, stackedAnswers]
+      // }
 
       async function runIt() {
         // Load data
-        const DC = await dogsncats.load()
+        console.log('loading')
+        const chess = await dfd.read_csv('chess_images.csv', 1)
+        const labels = await dfd.read_csv('chess_labels.csv', 1)
+        const chessTensor = chess.tensor.reshape([1, 224, 224, 3])
+        const Y = labels.tensor
+        console.log('done', chessTensor.shape, labelsTensor.shape)
+
         // Load feature model
         const tfhubURL = "https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_130_224/feature_vector/3/default/1"
         const featureModel = await tf.loadGraphModel(tfhubURL, { fromTFHub: true })
+
+        const featureX = featureModel.predict(chessTensor)
         // Push data through feature detection
-        const [featureX, Y] = await buildFeatureSet(DC, featureModel)
-        console.log(`Features stack ${featureX.shape} and answers stack ${Y.shape}`)
+        // const [featureX, Y] = await buildFeatureSet(DC, featureModel)
+        console.log(`Features stack ${featureX.shape}`)
 
         const transferModel = tf.sequential({
           layers: [
