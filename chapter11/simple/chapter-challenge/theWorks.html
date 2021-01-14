@@ -91,8 +91,6 @@
       }
 
       async function loaded() {
-        // load model
-        const model = await tf.loadLayersModel('sorting_hat/model.json')
         // get the canvas element and its context
         const canvas = document.getElementById('sketchpad')
         const context = canvas.getContext('2d')
@@ -170,7 +168,8 @@
       </div>
       <div class="result" id="klingon">
         <img src="images/klingon.png" class="logo" />
-        Klingon</div>
+        Klingon
+      </div>
       <div class="result" id="ferengi">
         <img src="images/ferengi.png" class="logo" />
         Ferengi
