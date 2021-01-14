@@ -3,3 +3,5 @@ node_modules
 .cache
 dist
 yarn-error.log
+chess_labels.csv
+chess_images.csv
