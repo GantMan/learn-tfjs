@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@0.1.2/dist/index.min.js"></script>
+    <script>
+      async function runIt() {
+        console.log('Loading huge CSV - this will take a while')
+        const numImages = 130 // between 1 and 150
+        // Get Y values
+        const labels = await dfd.read_csv('chess_labels.csv', numImages)
+        const Y = labels.tensor
+        // Get X values (Chess images)
+        const chessImages = await dfd.read_csv('chess_images.csv', numImages)
+        const chessTensor = chessImages.tensor.reshape([
+          labels.shape[0],
+          224,
+          224,
+          3,
+        ])
+        console.log('Finished loading CSVs', chessTensor.shape, Y.shape)
+
+        // Load feature model
+        const featureModel = await tf.loadLayersModel('mobilenet/model.json')
+        const lastLayer = featureModel.getLayer('conv_pw_13_relu')
+        const shavedModel = tf.model({
+          inputs: featureModel.inputs,
+          outputs: lastLayer.output,
+        })
+
+        console.log('Creating features from images - this may take a while...')
+        const featureX = shavedModel.predict(chessTensor)
+        // Push data through feature detection
+        console.log(`Features stack ${featureX.shape}`)
+
+        // Create NN
+        const transferModel = tf.sequential({
+          layers: [
+            tf.layers.flatten({ inputShape: featureX.shape.slice(1) }),
+            tf.layers.dense({ units: 64, activation: 'relu' }),
+            tf.layers.dense({ units: 6, activation: 'softmax' }),
+          ],
+        })
+
+        const adam = tf.train.adam(0.0001)
+        transferModel.compile({
+          optimizer: adam,
+          loss: 'categoricalCrossentropy',
+          metrics: ['accuracy'],
+        })
+
+        const history = await transferModel.fit(featureX, Y, {
+          validationSplit: 0.2,
+          epochs: 10,
+          callbacks: { onEpochEnd: console.log },
+        })
+      }
+
+      runIt()
+    </script>
+  </head>
+  <body>
+    <h1>Check the console log!</h1>
+  </body>
+</html>

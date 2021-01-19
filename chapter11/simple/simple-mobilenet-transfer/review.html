@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
+    <script>
+      async function runIt() {
+        const featureModel = await tf.loadLayersModel('mobilenet/model.json')
+        console.log('ORIGINAL MODEL')
+        featureModel.summary()
+        const lastLayer = featureModel.getLayer('conv_pw_13_relu')
+        const shavedModel = tf.model({
+          inputs: featureModel.inputs,
+          outputs: lastLayer.output,
+        })
+        console.log('SHAVED DOWN MODEL')
+        shavedModel.summary()
+      }
+
+      runIt()
+    </script>
+  </head>
+  <body>
+    <h1>Check the console log!</h1>
+  </body>
+</html>

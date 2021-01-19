@@ -2,7 +2,7 @@
 <html>
   <head>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
-    <script src="https://unpkg.com/dogs-n-cats" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@0.1.2/dist/index.min.js"></script>
     <script>
       async function runIt() {
         console.log('Loading huge CSV - this will take a while')
@@ -26,6 +26,7 @@
         const featureModel = await tf.loadGraphModel(tfhubURL, {
           fromTFHub: true,
         })
+        console.log('Creating features from images - this may take a while...')
         const featureX = featureModel.predict(chessTensor)
         // Push data through feature detection
         console.log(`Features stack ${featureX.shape}`)
