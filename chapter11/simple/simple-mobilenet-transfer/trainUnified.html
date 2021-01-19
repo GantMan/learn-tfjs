@@ -26,21 +26,34 @@
         const shavedModel = tf.model({
           inputs: featureModel.inputs,
           outputs: lastLayer.output,
-        })
+        })        
 
-        console.log('Creating features from images - this may take a while...')
-        const featureX = shavedModel.predict(chessTensor)
-        // Push data through feature detection
-        console.log(`Features stack ${featureX.shape}`)
+        const transferModel = tf.sequential()
+        transferModel.add(shavedModel)
+        transferModel.add(
+          // tf.layers.flatten()
+          tf.layers.globalAveragePooling2d({})
+        )
+        transferModel.add(
+          tf.layers.dense({ units: 64, activation: 'relu' }),
+        )
+        transferModel.add(
+          tf.layers.dense({ units: 6, activation: 'softmax' }),
+        )
 
-        // Create NN
-        const transferModel = tf.sequential({
-          layers: [
-            tf.layers.flatten({ inputShape: featureX.shape.slice(1) }),
-            tf.layers.dense({ units: 64, activation: 'relu' }),
-            tf.layers.dense({ units: 6, activation: 'softmax' }),
-          ],
-        })
+        // const flattenLayer = tf.layers.flatten().apply(lastLayer.output)
+        // const deepLayer = tf.layers.dense({units: 64, activation: "relu"}).apply(flattenLayer);
+        // const classificationLayer = tf.layers.dense({ units: 6, activation: "softmax" }).apply(deepLayer)
+
+        // const combo = tf.model({
+        //   inputs: featureModel.inputs,
+        //   outputs: [
+        //     lastLayer.output,
+        //     flattenLayer,
+        //     deepLayer,
+        //     classificationLayer
+        //   ]
+        // });        
 
         transferModel.compile({
           optimizer: 'adam',
@@ -48,9 +61,11 @@
           metrics: ['accuracy'],
         })
 
-        const history = await transferModel.fit(featureX, Y, {
+        transferModel.summary()
+
+        const history = await transferModel.fit(chessTensor, Y, {
           validationSplit: 0.2,
-          epochs: 15,
+          epochs: 10,
           callbacks: { onEpochEnd: console.log },
         })
       }
