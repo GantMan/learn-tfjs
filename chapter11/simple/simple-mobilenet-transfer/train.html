@@ -42,16 +42,15 @@
           ],
         })
 
-        const adam = tf.train.adam(0.0001)
         transferModel.compile({
-          optimizer: adam,
+          optimizer: 'adam',
           loss: 'categoricalCrossentropy',
           metrics: ['accuracy'],
         })
 
         const history = await transferModel.fit(featureX, Y, {
           validationSplit: 0.2,
-          epochs: 10,
+          epochs: 15,
           callbacks: { onEpochEnd: console.log },
         })
       }
