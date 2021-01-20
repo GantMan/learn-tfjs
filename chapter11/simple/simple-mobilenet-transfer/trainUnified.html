@@ -39,21 +39,7 @@
         )
         transferModel.add(
           tf.layers.dense({ units: 6, activation: 'softmax' }),
-        )
-
-        // const flattenLayer = tf.layers.flatten().apply(lastLayer.output)
-        // const deepLayer = tf.layers.dense({units: 64, activation: "relu"}).apply(flattenLayer);
-        // const classificationLayer = tf.layers.dense({ units: 6, activation: "softmax" }).apply(deepLayer)
-
-        // const combo = tf.model({
-        //   inputs: featureModel.inputs,
-        //   outputs: [
-        //     lastLayer.output,
-        //     flattenLayer,
-        //     deepLayer,
-        //     classificationLayer
-        //   ]
-        // });        
+        )     
 
         transferModel.compile({
           optimizer: 'adam',

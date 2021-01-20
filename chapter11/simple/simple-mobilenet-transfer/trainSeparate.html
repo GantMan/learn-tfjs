@@ -53,6 +53,18 @@
           epochs: 10,
           callbacks: { onEpochEnd: console.log },
         })
+
+        // combine the models
+        const combo = tf.sequential()
+        combo.add(shavedModel)
+        combo.add(transferModel)    
+        combo.compile({
+          optimizer: 'adam',
+          loss: 'categoricalCrossentropy',
+          metrics: ['accuracy'],
+        })        
+        combo.summary()
+        
       }
 
       runIt()
