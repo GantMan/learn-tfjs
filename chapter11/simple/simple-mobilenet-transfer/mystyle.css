@@ -1,0 +1,25 @@
+#examples {
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+}
+
+#examples p {
+  font-weight: bold;
+  padding: 10px;
+}
+
+.example {
+  height: 14VW;
+}
+
+#test {
+  height: 30VW;
+}
+
+#testContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  flex-direction: column;
+}
