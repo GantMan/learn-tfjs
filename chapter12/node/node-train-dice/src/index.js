@@ -1,34 +1,56 @@
 import * as tf from '@tensorflow/tfjs-node'
+import { shuffleCombo } from './helper'
 
 const inputShape = [12, 12, 1]
 const epochs = 10
-const diceData = require('./dice_data.json').dice
+const testSplit = 0.05
+const diceData = require('./dice_data.json')
 
 // Wrap in a tidy for memory
-const [stackedX, stackedY] = tf.tidy(() => {
+const [trainX, trainY, testX, testY] = tf.tidy(() => {
   // Build a stacked tensor from JSON
-  const xs = tf
-    .concat([
-      diceData['0'],
-      diceData['1'],
-      diceData['2'],
-      diceData['3'],
-      diceData['4'],
-      diceData['5'],
-      diceData['6'],
-      diceData['7'],
-      diceData['8'],
-      diceData['inverted0'],
-      diceData['inverted1'],
-      diceData['inverted2'],
-      diceData['inverted3'],
-      diceData['inverted4'],
-      diceData['inverted5'],
-      diceData['inverted6'],
-      diceData['inverted7'],
-      diceData['inverted8'],
-    ])
-    .expandDims(3)
+  const diceImages = [].concat(
+    diceData['0'],
+    diceData['1'],
+    diceData['2'],
+    diceData['3'],
+    diceData['4'],
+    diceData['5'],
+    diceData['6'],
+    diceData['7'],
+    diceData['8'],
+    diceData['inverted0'],
+    diceData['inverted1'],
+    diceData['inverted2'],
+    diceData['inverted3'],
+    diceData['inverted4'],
+    diceData['inverted5'],
+    diceData['inverted6'],
+    diceData['inverted7'],
+    diceData['inverted8']
+  )
+
+  // const xs = tf.concat([
+  //   diceData['0'],
+  //   diceData['1'],
+  //   diceData['2'],
+  //   diceData['3'],
+  //   diceData['4'],
+  //   diceData['5'],
+  //   diceData['6'],
+  //   diceData['7'],
+  //   diceData['8'],
+  //   diceData['inverted0'],
+  //   diceData['inverted1'],
+  //   diceData['inverted2'],
+  //   diceData['inverted3'],
+  //   diceData['inverted4'],
+  //   diceData['inverted5'],
+  //   diceData['inverted6'],
+  //   diceData['inverted7'],
+  //   diceData['inverted8'],
+  // ])
+  // .expandDims(3)
 
   // Now the answers to their corresponding index
   const answers = [].concat(
@@ -51,24 +73,32 @@ const [stackedX, stackedY] = tf.tidy(() => {
     new Array(diceData['inverted7'].length).fill(16),
     new Array(diceData['inverted8'].length).fill(17)
   )
-  const ys = tf.oneHot(answers, diceData.length)
+  // const ys = tf.oneHot(answers, diceData.length)
 
-  return [xs, ys]
+  // Randomize & Split
+  shuffleCombo(diceImages, answers)
+  // Group into train/test split
+  const testCount = parseInt(diceImages.length * testSplit)
+  const trainCount = diceImages.length - testCount
+  const testImgData = diceImages.slice(trainCount)
+  const testAnswerData = answers.slice(trainCount)
+  diceImages.splice(trainCount)
+  answers.splice(trainCount)
+
+  // Convert to tensors
+  const numOptions = Object.keys(diceData).length
+  const trainX = tf.tensor(diceImages).expandDims(3)
+  const trainY = tf.oneHot(answers, numOptions)
+  const testX = tf.tensor(testImgData).expandDims(3)
+  const testY = tf.oneHot(testAnswerData, numOptions)
+
+  return [trainX, trainY, testX, testY]
 })
 
-const testModel = (model, img2Test) => {
-  const img = new Image()
-  img.crossOrigin = 'anonymous'
-  img.src = img2Test
-  img.onload = async () => {
-    const imgTensor = tf.browser.fromPixels(img, 1).expandDims()
-
-    const tensorResults = model.predict(imgTensor)
-    const results = tensorResults.arraySync()
-
-    console.log(`${img2Test} returned ${results}`)
-  }
-}
+console.log('trainX ', trainX.shape)
+console.log('trainY ', trainY.shape)
+console.log('testX ', testX.shape)
+console.log('testY ', testY.shape)
 
 const trainModel = async () => {
   const model = tf.sequential()
