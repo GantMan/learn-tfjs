@@ -22,22 +22,6 @@
     "@types/seedrandom" "2.4.27"
     seedrandom "2.4.3"
 
-"@tensorflow/tfjs-backend-cpu@2.8.5":
-  version "2.8.5"
-  resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-backend-cpu/-/tfjs-backend-cpu-2.8.5.tgz#3fc8afcecffe669691dd3dfa9256e08a058e8d4d"
-  integrity sha512-6Wpp5wPkNzAm1MovtXU9Gs3hIRl/iqc7CUHlqCB4hUBIDHM7zek7vm7JjQv5IopzYNtHnuasSklNR9kb4ZAOdA==
-  dependencies:
-    "@types/seedrandom" "2.4.27"
-    seedrandom "2.4.3"
-
-"@tensorflow/tfjs-backend-wasm@^2.8.5":
-  version "2.8.5"
-  resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-backend-wasm/-/tfjs-backend-wasm-2.8.5.tgz#68b424d2ea1bcfc4a5cbbe41c18de9eb773450c4"
-  integrity sha512-Pt85ndNbOaMtR16wHSwgRkXRXIO8kufg1TzjxF/BnU0N9YZD396UB9pyr04+vNgAp0Ne5Edkp+Zz+WEthD36+A==
-  dependencies:
-    "@tensorflow/tfjs-backend-cpu" "2.8.5"
-    "@types/emscripten" "~0.0.34"
-
 "@tensorflow/tfjs-backend-webgl@2.7.0":
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-backend-webgl/-/tfjs-backend-webgl-2.7.0.tgz#e9899fd761fa38ab9914b1910e0bf38f5104a0c4"
@@ -110,11 +94,6 @@
     core-js "3"
     regenerator-runtime "^0.13.5"
     yargs "^16.0.3"
-
-"@types/emscripten@~0.0.34":
-  version "0.0.34"
-  resolved "https://registry.yarnpkg.com/@types/emscripten/-/emscripten-0.0.34.tgz#12b4a344274fb102ff2f6c877b37587bc3e46008"
-  integrity sha512-QSb9ojDincskc+uKMI0KXp8e1NALFINCrMlp8VGKGcTSxeEyRTTKyjWw75NYrCZHUsVEEEpr1tYHpbtaC++/sQ==
 
 "@types/node-fetch@^2.1.2":
   version "2.5.8"
