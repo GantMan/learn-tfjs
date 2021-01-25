@@ -56,7 +56,6 @@ const runAugmentation = async (aTensor) => {
   await combos(mutes)
   await combos(mutes)
   return await consolidate(mutes)
-  // return mutes
 }
 
 const flipTensor = (dit) => {
@@ -67,22 +66,32 @@ const flipTensor = (dit) => {
   })
 }
 
-const doStuff = async () => {
+const createDataObject = async () => {
   // Tensor Array
-  const inDie = require('./dice.json').data
-  const imgTensor = tf.tensor(inDie[0], [12, 12, 1])
-  const results = await runAugmentation(imgTensor)
-  console.log('Results:', results.shape)
-  const invertedResults = flipTensor(results)
-  console.log('Inverted:', invertedResults.shape)
-  const augResults = results.arraySync()
+  const inDice = require('./dice.json').data
+  const diceData = {}
+  
+  for (let idx = 0; idx < inDice.length; idx++) {
+    console.log(idx)
+    const die = inDice[idx]
+    const imgTensor = tf.tensor(die, [12, 12, 1])
+    const results = await runAugmentation(imgTensor)
+    console.log('Results:', results.shape)
+    const invertedResults = flipTensor(results)
+    console.log('Inverted:', invertedResults.shape)
+    
+    // Store results
+    diceData[idx] = results.arraySync()
+    diceData[`inverted${idx}`] = invertedResults.arraySync()
+  
+    tf.dispose([results, imgTensor, invertedResults])
+  }
 
-  tf.dispose([results, imgTensor, invertedResults])
   console.log('Memory', tf.memory().numTensors)
 }
 
 try {
-  doStuff()
+  createDataObject()
 } catch (e) {
   console.error('ERROR', e)
 }
