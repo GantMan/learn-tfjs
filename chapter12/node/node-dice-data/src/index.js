@@ -22,15 +22,16 @@ const pixelShift = async (inputTensor, mutations = []) => {
 
 // Creates combinations take any two from inputAarray (like Py itertools.combinations)
 const combos = async (tensorArray) => {
-  const arrCopy = [...tensorArray]
-  const startSize = arrCopy.length
+  const startSize = tensorArray.length
   for (let i = 0; i < startSize - 1; i++) {
     for (let j = i + 1; j < startSize; j++) {
-      const overlay = tf.where(
-        tf.less(arrCopy[i], arrCopy[j]),
-        arrCopy[i],
-        arrCopy[j]
-      )
+      const overlay = tf.tidy(() => {
+        return tf.where(
+          tf.less(tensorArray[i], tensorArray[j]),
+          tensorArray[i],
+          tensorArray[j]
+        )      
+      })
       tensorArray.push(overlay)
     }
   }
@@ -39,12 +40,18 @@ const combos = async (tensorArray) => {
 // Remove duplicates and stack into a 4D tensor
 const consolidate = async (tensorArray) => {
   const groupedData = tf.stack(tensorArray)
-  const { values } = tf.unique(groupedData)
-  groupedData.dispose()
+  console.log("Grouped Data:", groupedData.shape)
+  // Needs to switch processing to CPU for `tf.unique` on Node
+  // See: https://github.com/tensorflow/tfjs/issues/4595c
+  await tf.setBackend('cpu');
+  const { values, _indices } = tf.unique(groupedData)
+  
+  tf.dispose([groupedData, _indices])
+  tf.dispose(tensorArray)
   return values
 }
 
-const runData = async (aTensor) => {
+const runAugmentation = async (aTensor) => {
   const mutes = await pixelShift(aTensor)
   await combos(mutes)
   await combos(mutes)
@@ -53,22 +60,25 @@ const runData = async (aTensor) => {
 }
 
 const flipTensor = (dit) => {
-  // const flip = tf.logicalNot(dit.asType("bool")).asType("float32")
-  const flip = dit.sub(1).mul(-1)
-  return flip
+  return tf.tidy(() => {
+    // const flip = tf.logicalNot(dit.asType("bool")).asType("float32")
+    const flip = dit.sub(1).mul(-1)
+    return flip
+  })
 }
 
 const doStuff = async () => {
   // Tensor Array
-  const inTensor = require('./dice.json').data
-  // some image here
-  const imgTensor = tf.tensor(inTensor[0], [12, 12, 1])
-  const results = await runData(imgTensor)
-  const augResults = results.reshape([results.shape[0], 12, 12]).arraySync()
+  const inDie = require('./dice.json').data
+  const imgTensor = tf.tensor(inDie[0], [12, 12, 1])
+  const results = await runAugmentation(imgTensor)
+  console.log('Results:', results.shape)
+  const invertedResults = flipTensor(results)
+  console.log('Inverted:', invertedResults.shape)
+  const augResults = results.arraySync()
 
-  console.log(augResults.shape)
-  tf.dispose([augResults, results, imgTensor])
-  console.log(tf.memory().numTensors)
+  tf.dispose([results, imgTensor, invertedResults])
+  console.log('Memory', tf.memory().numTensors)
 }
 
 try {
