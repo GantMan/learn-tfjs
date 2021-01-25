@@ -1,4 +1,5 @@
 import * as tf from '@tensorflow/tfjs-node'
+const fs = require('fs');
 
 const pixelShift = async (inputTensor, mutations = []) => {
   // Add 1px white padding to height and width
@@ -6,14 +7,13 @@ const pixelShift = async (inputTensor, mutations = []) => {
     [
       [1, 1],
       [1, 1],
-      [0, 0],
     ],
     1
   )
   const cutSize = inputTensor.shape
   for (let h = 0; h < 3; h++) {
     for (let w = 0; w < 3; w++) {
-      mutations.push(padded.slice([h, w, 0], cutSize))
+      mutations.push(padded.slice([h, w], cutSize))
     }
   }
   padded.dispose()
@@ -74,7 +74,7 @@ const createDataObject = async () => {
   for (let idx = 0; idx < inDice.length; idx++) {
     console.log(idx)
     const die = inDice[idx]
-    const imgTensor = tf.tensor(die, [12, 12, 1])
+    const imgTensor = tf.tensor(die)
     const results = await runAugmentation(imgTensor)
     console.log('Results:', results.shape)
     const invertedResults = flipTensor(results)
@@ -87,6 +87,11 @@ const createDataObject = async () => {
     tf.dispose([results, imgTensor, invertedResults])
   }
 
+  const jsonString = JSON.stringify(diceData)
+  fs.writeFile('dice_data.json', jsonString, (err) => {
+    if (err) throw err;
+    console.log('Data written to file');
+  });  
   console.log('Memory', tf.memory().numTensors)
 }
 
