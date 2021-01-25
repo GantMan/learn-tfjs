@@ -30,28 +30,6 @@ const [trainX, trainY, testX, testY] = tf.tidy(() => {
     diceData['inverted8']
   )
 
-  // const xs = tf.concat([
-  //   diceData['0'],
-  //   diceData['1'],
-  //   diceData['2'],
-  //   diceData['3'],
-  //   diceData['4'],
-  //   diceData['5'],
-  //   diceData['6'],
-  //   diceData['7'],
-  //   diceData['8'],
-  //   diceData['inverted0'],
-  //   diceData['inverted1'],
-  //   diceData['inverted2'],
-  //   diceData['inverted3'],
-  //   diceData['inverted4'],
-  //   diceData['inverted5'],
-  //   diceData['inverted6'],
-  //   diceData['inverted7'],
-  //   diceData['inverted8'],
-  // ])
-  // .expandDims(3)
-
   // Now the answers to their corresponding index
   const answers = [].concat(
     new Array(diceData['0'].length).fill(0),
@@ -73,7 +51,6 @@ const [trainX, trainY, testX, testY] = tf.tidy(() => {
     new Array(diceData['inverted7'].length).fill(16),
     new Array(diceData['inverted8'].length).fill(17)
   )
-  // const ys = tf.oneHot(answers, diceData.length)
 
   // Randomize & Split
   shuffleCombo(diceImages, answers)
@@ -139,7 +116,7 @@ const trainModel = async () => {
     },
   }
 
-  await model.fit(stackedX, stackedY, {
+  await model.fit(trainX, trainY, {
     epochs,
     shuffle: true,
     batchSize: 32,
