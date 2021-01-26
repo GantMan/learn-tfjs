@@ -133,6 +133,7 @@ async function makeModel () {
   const data = await makeData()
   const model = await trainModel(data)
   evaluateResults(model, data)
+  model.save("file://./dice-model")
 }
 
 makeModel()
