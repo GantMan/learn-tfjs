@@ -6,7 +6,7 @@ const epochs = 10
 const testSplit = 0.05
 const diceData = require('./dice_data.json')
 
-function makeData() {
+function prepData() {
   // Wrap in a tidy for memory
   const [trainX, trainY, testX, testY] = tf.tidy(() => {
     // Build a stacked tensor from JSON
@@ -130,7 +130,7 @@ async function evaluateResults(model, data) {
 }
 
 async function makeModel () {
-  const data = await makeData()
+  const data = await prepData()
   const model = await trainModel(data)
   evaluateResults(model, data)
   model.save("file://./dice-model")
