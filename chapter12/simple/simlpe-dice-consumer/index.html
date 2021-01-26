@@ -5,7 +5,7 @@
     <script type="module">
       import { DICE_DATA } from './dice.js'
       const diceData = DICE_DATA.data
-      const imgURL = '/test3.png'
+      const imgURL = '/test2.png'
       const numDice = 48
       const preSize = numDice * 10
 
@@ -71,7 +71,7 @@
 
       const doStuff = async () => {
         // const modelPath =
-        //   'https://s3.amazonaws.com/ir_public/ai/dice/dice-model.json'
+        // 'https://s3.amazonaws.com/ir_public/ai/dice/dice-model.json'
         const modelPath = '/dice-model/model.json'
         const dModel = await tf.loadLayersModel(modelPath)
         console.log(dModel.input.shape)
