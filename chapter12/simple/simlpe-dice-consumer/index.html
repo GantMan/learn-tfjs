@@ -24,9 +24,8 @@
       }
 
       const predictResults = (model, tGrid) => {
-        tf.tidy(() => {
+        return tf.tidy(() => {
           const patchStack = []
-          const diceTensors = diceData.map((dt) => tf.tensor(dt))
 
           // Create array of properly sized tensors
           tGrid.forEach((row) => {
@@ -40,9 +39,16 @@
           console.log('Ready to predict shape ', imageGroup.shape)
           const answers = model.predict(imageGroup)
           console.log('Predicted shape ', answers.shape)
+          return answers         
+        })
+      }
+
+      const displayPredictions = async (answers) => {
+        tf.tidy(() => {
+          const diceTensors = diceData.map((dt) => tf.tensor(dt))
           const { indices } = tf.topk(answers)
           const answerIndices = indices.dataSync()
-
+  
           // You have to concat via tensors, can't use 2d JS Arrays
           // If you try to keep these in JS and then convert
           // to tensor, they will be broken
@@ -58,9 +64,9 @@
             tColumns.push(oneRow)
           }
           const diceConstruct = tf.concat(tColumns)
-
+          // Print the reconstruction to the canvas
           const can = document.getElementById('display')
-          tf.browser.toPixels(diceConstruct, can)          
+          tf.browser.toPixels(diceConstruct, can) 
         })
       }
 
@@ -69,9 +75,10 @@
         const dModel = await tf.loadLayersModel(modelPath)
 
         const grid = await cutData("input")
-        predictResults(dModel, grid)
+        const predictions = await predictResults(dModel, grid)
+        await displayPredictions(predictions)
 
-        tf.dispose([imgTensor, dModel])
+        tf.dispose([dModel, predictions])
         tf.dispose(grid)
       }
 
