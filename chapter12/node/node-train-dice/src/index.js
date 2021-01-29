@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs-node'
 import { shuffleCombo } from './helper'
 
 const inputShape = [12, 12, 1]
-const epochs = 50
+const epochs = 20
 const testSplit = 0.05
 const diceData = require('./dice_data.json')
 
@@ -20,15 +20,6 @@ function prepData() {
       diceData['6'],
       diceData['7'],
       diceData['8'],
-      diceData['inverted0'],
-      diceData['inverted1'],
-      diceData['inverted2'],
-      diceData['inverted3'],
-      diceData['inverted4'],
-      diceData['inverted5'],
-      diceData['inverted6'],
-      diceData['inverted7'],
-      diceData['inverted8']
     )
 
     // Now the answers to their corresponding index
@@ -42,15 +33,6 @@ function prepData() {
       new Array(diceData['6'].length).fill(6),
       new Array(diceData['7'].length).fill(7),
       new Array(diceData['8'].length).fill(8),
-      new Array(diceData['inverted0'].length).fill(9),
-      new Array(diceData['inverted1'].length).fill(10),
-      new Array(diceData['inverted2'].length).fill(11),
-      new Array(diceData['inverted3'].length).fill(12),
-      new Array(diceData['inverted4'].length).fill(13),
-      new Array(diceData['inverted5'].length).fill(14),
-      new Array(diceData['inverted6'].length).fill(15),
-      new Array(diceData['inverted7'].length).fill(16),
-      new Array(diceData['inverted8'].length).fill(17)
     )
 
     // Randomize & Split
@@ -100,7 +82,7 @@ const trainModel = async (data) => {
   )
   model.add(
     tf.layers.dense({
-      units: 18,
+      units: 9,
       kernelInitializer: 'varianceScaling',
       activation: 'softmax',
     })

@@ -40,12 +40,10 @@ const combos = async (tensorArray) => {
 // Remove duplicates and stack into a 4D tensor
 const consolidate = async (tensorArray) => {
   const groupedData = tf.stack(tensorArray)
-  console.log('Grouped Data:', groupedData.shape)
   // Needs to switch processing to CPU for `tf.unique` on Node
   // See: https://github.com/tensorflow/tfjs/issues/4595
   await tf.setBackend('cpu')
   const { values, _indices } = tf.unique(groupedData)
-
   tf.dispose([groupedData, _indices])
   tf.dispose(tensorArray)
   return values
@@ -53,10 +51,10 @@ const consolidate = async (tensorArray) => {
 
 // Adds shades to dice depending on idx, slowly darkens
 const gradiate = (tensorArray, idx) => {
-  const shade = 1 / 18 // 18 possible
+  const shade = 1 / 9 // all possible possible
   const startShade = shade * idx
   const endShade = shade * (idx + 1)
-  const stepSpeed = 0.001
+  const stepSpeed = 0.05
 
   for (let x = startShade; x < endShade; x += stepSpeed) {
     const shadeDie = tf.fill([12, 12], 1 - x)
@@ -72,37 +70,20 @@ const runAugmentation = async (aTensor, idx) => {
   return await consolidate(mutes)
 }
 
-const flipTensor = (dit) => {
-  return tf.tidy(() => {
-    // Via logic - fails on gradients
-    // const flip = tf.logicalNot(dit.asType("bool")).asType("float32")
-    // const flip = dit.sub(1).mul(-1) // wont' work on gradients
-
-    // Works on gradients
-    const onez = tf.onesLike(dit)
-    return tf.sub(onez, dit)
-  })
-}
-
 const createDataObject = async () => {
   // Tensor Array
   const inDice = require('./dice.json').data
   const diceData = {}
 
   for (let idx = 0; idx < inDice.length; idx++) {
-    console.log(idx)
     const die = inDice[idx]
     const imgTensor = tf.tensor(die)
     const results = await runAugmentation(imgTensor, idx)
-    console.log('Results:', results.shape)
-    const invertedResults = flipTensor(results)
-    console.log('Inverted:', invertedResults.shape)
-
+    console.log('Unique Results:', idx, results.shape)
     // Store results
     diceData[idx] = results.arraySync()
-    diceData[`inverted${idx}`] = invertedResults.arraySync()
-
-    tf.dispose([results, imgTensor, invertedResults])
+    // clean
+    tf.dispose([results, imgTensor])
   }
 
   const jsonString = JSON.stringify(diceData)
@@ -110,7 +91,6 @@ const createDataObject = async () => {
     if (err) throw err
     console.log('Data written to file')
   })
-  console.log('Memory', tf.memory().numTensors)
 }
 
 try {
