@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs-node'
 import { shuffleCombo } from './helper'
 
 const inputShape = [12, 12, 1]
-const epochs = 10
+const epochs = 50
 const testSplit = 0.05
 const diceData = require('./dice_data.json')
 
@@ -78,7 +78,7 @@ function prepData() {
   console.log('testX ', testX.shape)
   console.log('testY ', testY.shape)
 
-  return [trainX, trainY, testX, testY] 
+  return [trainX, trainY, testX, testY]
 }
 
 const trainModel = async (data) => {
@@ -124,16 +124,16 @@ const trainModel = async (data) => {
 
 async function evaluateResults(model, data) {
   const result = model.evaluate(data[2], data[3])
-  console.log("Test Loss", result[0].dataSync())
-  console.log("Test Accuracy", result[1].dataSync())
+  console.log('Test Loss', result[0].dataSync())
+  console.log('Test Accuracy', result[1].dataSync())
   tf.dispose(result)
 }
 
-async function makeModel () {
+async function makeModel() {
   const data = await prepData()
   const model = await trainModel(data)
   evaluateResults(model, data)
-  model.save("file://./dice-model")
+  model.save('file://./dice-model')
 }
 
 makeModel()

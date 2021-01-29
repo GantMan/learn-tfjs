@@ -51,18 +51,36 @@ const consolidate = async (tensorArray) => {
   return values
 }
 
-const runAugmentation = async (aTensor) => {
+// Adds shades to dice depending on idx, slowly darkens
+const gradiate = (tensorArray, idx) => {
+  const shade = 1 / 18 // 18 possible
+  const startShade = shade * idx
+  const endShade = shade * (idx + 1)
+  const stepSpeed = 0.001
+
+  for (let x = startShade; x < endShade; x += stepSpeed) {
+    const shadeDie = tf.fill([12, 12], 1 - x)
+    tensorArray.push(shadeDie)
+  }
+}
+
+const runAugmentation = async (aTensor, idx) => {
   const mutes = await pixelShift(aTensor)
   await combos(mutes)
   await combos(mutes)
+  await gradiate(mutes, idx)
   return await consolidate(mutes)
 }
 
 const flipTensor = (dit) => {
   return tf.tidy(() => {
+    // Via logic - fails on gradients
     // const flip = tf.logicalNot(dit.asType("bool")).asType("float32")
-    const flip = dit.sub(1).mul(-1)
-    return flip
+    // const flip = dit.sub(1).mul(-1) // wont' work on gradients
+
+    // Works on gradients
+    const onez = tf.onesLike(dit)
+    return tf.sub(onez, dit)
   })
 }
 
@@ -75,7 +93,7 @@ const createDataObject = async () => {
     console.log(idx)
     const die = inDice[idx]
     const imgTensor = tf.tensor(die)
-    const results = await runAugmentation(imgTensor)
+    const results = await runAugmentation(imgTensor, idx)
     console.log('Results:', results.shape)
     const invertedResults = flipTensor(results)
     console.log('Inverted:', invertedResults.shape)

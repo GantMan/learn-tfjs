@@ -5,7 +5,7 @@
     <script type="module">
       import { DICE_DATA } from './dice.js'
       const diceData = DICE_DATA.data
-      const imgURL = '/test2.png'
+      const imgURL = '/ir.png'
       const numDice = 32
       const preSize = numDice * 10
 
@@ -23,7 +23,7 @@
       }
 
       // helper method for visualizing
-      const showOne = (im, id='display') => {
+      const showOne = (im, id = 'display') => {
         const can = document.getElementById(id)
         tf.browser.toPixels(im, can)
       }
@@ -114,8 +114,14 @@
     <h1>Dicify AI</h1>
     <div id="app"></div>
     <h2>Dicify Result:</h2>
-    <canvas id="display" style="image-rendering: pixelated; width: 100%" ></canvas>
+    <canvas
+      id="display"
+      style="image-rendering: pixelated; width: 100%"
+    ></canvas>
     <h2>Dicify Blocks:</h2>
-    <canvas id="regroup" style="image-rendering: pixelated; width: 100%" ></canvas>    
+    <canvas
+      id="regroup"
+      style="image-rendering: pixelated; width: 100%"
+    ></canvas>
   </body>
 </html>
