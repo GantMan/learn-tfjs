@@ -20,7 +20,7 @@ const pixelShift = async (inputTensor, mutations = []) => {
   return mutations
 }
 
-// Creates combinations take any two from inputAarray (like Py itertools.combinations)
+// Creates combinations take any two from array (like Py itertools.combinations)
 const combos = async (tensorArray) => {
   const startSize = tensorArray.length
   for (let i = 0; i < startSize - 1; i++) {
@@ -66,12 +66,11 @@ const runAugmentation = async (aTensor, idx) => {
   const mutes = await pixelShift(aTensor)
   await combos(mutes)
   await combos(mutes)
-  await gradiate(mutes, idx)
+  await gradiate(mutes, idx) // a little bonus for shades of gray
   return await consolidate(mutes)
 }
 
 const createDataObject = async () => {
-  // Tensor Array
   const inDice = require('./dice.json').data
   const diceData = {}
 
