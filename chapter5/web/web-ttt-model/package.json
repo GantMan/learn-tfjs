@@ -8,7 +8,8 @@
     "build": "parcel build index.html"
   },
   "dependencies": {
-    "@tensorflow/tfjs": "2.6.0"
+    "@tensorflow/tfjs": "2.6.0",
+    "@tensorflow/tfjs-node": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "7.2.0",

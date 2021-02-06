@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@tensorflow-models/toxicity": "^1.2.2",
-    "@tensorflow/tfjs": "2.1.0"
+    "@tensorflow/tfjs": "3.0.0"
   },
   "devDependencies": {
     "@babel/core": "7.2.0",

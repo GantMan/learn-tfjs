@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/GantMan/learn-tfjs#readme",
   "dependencies": {
-    "@tensorflow/tfjs-node": "^2.4.0"
+    "@tensorflow/tfjs-node": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^14.11.2",

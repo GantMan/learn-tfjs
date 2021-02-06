@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@tensorflow/tfjs": "2.7.0",
+    "@tensorflow/tfjs-node": "^3.0.0",
     "core-js": "^3.8.0",
     "regenerator-runtime": "^0.13.7"
   },
