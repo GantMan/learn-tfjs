@@ -11,14 +11,14 @@
 
       const cutData = async (id) => {
         const img = document.getElementById(id)
-        const imgTensor = tf.browser.fromPixels(img, 1)        
-        const resized = tf.image.resizeNearestNeighbor(
-          imgTensor, [preSize,preSize]
-        )
+        const imgTensor = tf.browser.fromPixels(img, 1)
+        const resized = tf.image.resizeNearestNeighbor(imgTensor, [
+          preSize,
+          preSize,
+        ])
         const cutSize = numDice
         const heightCuts = tf.split(resized, cutSize)
-        const grid = heightCuts.map((sliver) => 
-          tf.split(sliver, cutSize, 1))
+        const grid = heightCuts.map((sliver) => tf.split(sliver, cutSize, 1))
 
         return grid
       }
@@ -39,7 +39,7 @@
           console.log('Ready to predict shape ', imageGroup.shape)
           const answers = model.predict(imageGroup)
           console.log('Predicted shape ', answers.shape)
-          return answers         
+          return answers
         })
       }
 
@@ -48,7 +48,7 @@
           const diceTensors = diceData.map((dt) => tf.tensor(dt))
           const { indices } = tf.topk(answers)
           const answerIndices = indices.dataSync()
-  
+
           // You have to concat via tensors, can't use 2d JS Arrays
           // If you try to keep these in JS and then convert
           // to tensor, they will be broken
@@ -66,7 +66,7 @@
           const diceConstruct = tf.concat(tColumns)
           // Print the reconstruction to the canvas
           const can = document.getElementById('display')
-          tf.browser.toPixels(diceConstruct, can) 
+          tf.browser.toPixels(diceConstruct, can)
         })
       }
 
@@ -74,7 +74,7 @@
         const modelPath = '/dice-model/model.json'
         const dModel = await tf.loadLayersModel(modelPath)
 
-        const grid = await cutData("input")
+        const grid = await cutData('input')
         const predictions = await predictResults(dModel, grid)
         await displayPredictions(predictions)
 
@@ -88,8 +88,11 @@
   <body>
     <h1>Dicify AI</h1>
     <h2>Dicify This:</h2>
-    <img id="input" src="/logo.png" style="max-width: 100vw;">    
+    <img id="input" src="/logo.png" style="max-width: 100vw" />
     <h2>Dicify Result:</h2>
-    <canvas id="display" style="image-rendering: pixelated; width: 100%" />
+    <canvas
+      id="display"
+      style="image-rendering: pixelated; width: 100%"
+    ></canvas>
   </body>
 </html>

@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.6.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.0.0/dist/tf.min.js"></script>
   </head>
   <body>
     <h1>Locate Pet Faces - TensorFlow.js</h1>
     <div style="position: relative; height: 80vh">
       <img id="pet" src="/dog1.jpg" height="100%" />
-      <canvas id="detection" style="position: absolute; left: 0" />
+      <canvas id="detection" style="position: absolute; left: 0"></canvas>
     </div>
 
     <script>
       tf.ready().then(() => {
-        const modelPath = "/model/tfjs_quant_uint8/model.json";
+        const modelPath = '/model/tfjs_quant_uint8/model.json'
         tf.tidy(() => {
           tf.loadLayersModel(modelPath).then((model) => {
-            const petImage = document.getElementById("pet");
-            const myTensor = tf.browser.fromPixels(petImage);
+            const petImage = document.getElementById('pet')
+            const myTensor = tf.browser.fromPixels(petImage)
             // Model expects 256x256 0-1 value 3D tensor
             const readyfied = tf.image
               .resizeNearestNeighbor(myTensor, [256, 256], true)
               .div(255)
-              .reshape([1, 256, 256, 3]);
+              .reshape([1, 256, 256, 3])
 
-            const result = model.predict(readyfied);
+            const result = model.predict(readyfied)
             // Model returns top left and bottom right
-            result.print();
+            result.print()
 
             // Draw box on canvas
-            const detection = document.getElementById("detection");
-            const imgWidth = petImage.width;
-            const imgHeight = petImage.height;
-            detection.width = imgWidth;
-            detection.height = imgHeight;
-            const box = result.dataSync();
-            const startX = box[0] * imgWidth;
-            const startY = box[1] * imgHeight;
-            const width = (box[2] - box[0]) * imgWidth;
-            const height = (box[3] - box[1]) * imgHeight;
-            const ctx = detection.getContext("2d");
-            ctx.strokeStyle = "#0F0";
-            ctx.lineWidth = 4;
-            ctx.strokeRect(startX, startY, width, height);
-          });
-        });
-      });
+            const detection = document.getElementById('detection')
+            const imgWidth = petImage.width
+            const imgHeight = petImage.height
+            detection.width = imgWidth
+            detection.height = imgHeight
+            const box = result.dataSync()
+            const startX = box[0] * imgWidth
+            const startY = box[1] * imgHeight
+            const width = (box[2] - box[0]) * imgWidth
+            const height = (box[3] - box[1]) * imgHeight
+            const ctx = detection.getContext('2d')
+            ctx.strokeStyle = '#0F0'
+            ctx.lineWidth = 4
+            ctx.strokeRect(startX, startY, width, height)
+          })
+        })
+      })
     </script>
   </body>
 </html>

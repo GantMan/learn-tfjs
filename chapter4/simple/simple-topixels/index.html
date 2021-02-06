@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.1.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.0.0/dist/tf.min.js"></script>
   </head>
   <body>
     <h1>Look at that lovely random thing</h1>
-    <canvas id="randomness" />
+    <canvas id="randomness"></canvas>
     <script>
       const bigMess = tf.randomUniform([400, 400, 3])
       const myCanvas = document.getElementById('randomness')

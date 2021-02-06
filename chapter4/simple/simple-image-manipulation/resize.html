@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.6.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.0.0/dist/tf.min.js"></script>
   </head>
   <body>
     <h1>Resize Image Tensors</h1>
@@ -13,33 +13,41 @@
     </div>
     <h3>Resize Bilinear</h3>
     <div>
-      <canvas id="blCanvas" />
+      <canvas id="blCanvas"></canvas>
     </div>
     <a href="/">Back to index</a>
     <script>
-      window.addEventListener("load", function () {
+      window.addEventListener('load', function () {
         // Simple Tensor Flip
         const newSize = [768, 560] // 4x larger
-        const littleGantImage = document.getElementById("littleGant");
-        const nnCanvas = document.getElementById("nnCanvas");
-        const blCanvas = document.getElementById("blCanvas");
-        const gantTensor = tf.browser.fromPixels(littleGantImage);
+        const littleGantImage = document.getElementById('littleGant')
+        const nnCanvas = document.getElementById('nnCanvas')
+        const blCanvas = document.getElementById('blCanvas')
+        const gantTensor = tf.browser.fromPixels(littleGantImage)
 
-        const nnResizeTensor = tf.image.resizeNearestNeighbor(gantTensor, newSize, true)
+        const nnResizeTensor = tf.image.resizeNearestNeighbor(
+          gantTensor,
+          newSize,
+          true
+        )
         tf.browser.toPixels(nnResizeTensor, nnCanvas).then(() => {
-          nnResizeTensor.dispose();
+          nnResizeTensor.dispose()
         })
 
-        const blResizeTensor = tf.image.resizeBilinear(gantTensor, newSize, true)
+        const blResizeTensor = tf.image.resizeBilinear(
+          gantTensor,
+          newSize,
+          true
+        )
         const blResizeTensorInt = blResizeTensor.asType('int32')
         tf.browser.toPixels(blResizeTensorInt, blCanvas).then(() => {
-          blResizeTensor.dispose();
-          blResizeTensorInt.dispose();
+          blResizeTensor.dispose()
+          blResizeTensorInt.dispose()
         })
 
         // All done with ya
-        gantTensor.dispose();
-      });
+        gantTensor.dispose()
+      })
     </script>
   </body>
 </html>

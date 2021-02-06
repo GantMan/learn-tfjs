@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="mystyle.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
+    <link rel="stylesheet" href="mystyle.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.0.0/dist/tf.min.js"></script>
     <script>
       function displayResults(predictions) {
         // Get Scores
@@ -12,10 +12,10 @@
         const slytherin = predictions[6] + predictions[7]
         const deatheater = predictions[5]
 
-        document.getElementById("ravenclaw").style.opacity = ravenclaw
-        document.getElementById("gryffindor").style.opacity = gryffindor
-        document.getElementById("hufflepuff").style.opacity = hufflepuff
-        document.getElementById("slytherin").style.opacity = slytherin
+        document.getElementById('ravenclaw').style.opacity = ravenclaw
+        document.getElementById('gryffindor').style.opacity = gryffindor
+        document.getElementById('hufflepuff').style.opacity = hufflepuff
+        document.getElementById('slytherin').style.opacity = slytherin
 
         // Cute
         if (deatheater > 0.9) {
@@ -25,7 +25,11 @@
 
       async function makePrediction(canvas, model) {
         const drawTensor = tf.browser.fromPixels(canvas, 1)
-        const resize = tf.image.resizeNearestNeighbor(drawTensor, [28,28], true)
+        const resize = tf.image.resizeNearestNeighbor(
+          drawTensor,
+          [28, 28],
+          true
+        )
 
         const batched = resize.expandDims()
         const results = await model.predict(batched)
@@ -79,9 +83,9 @@
         }
 
         function clean() {
-          context.fillStyle = "#fff";     
-          context.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-          displayResults(new Array(10).fill(0))   
+          context.fillStyle = '#fff'
+          context.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight)
+          displayResults(new Array(10).fill(0))
         }
 
         canvas.addEventListener('touchstart', touchStart, false)
@@ -93,7 +97,7 @@
         canvas.addEventListener('mouseup', drawEnd, false)
         document.getElementById('clear').onclick = clean
 
-        // Prep canvas 
+        // Prep canvas
         clean()
       }
     </script>
@@ -109,22 +113,14 @@
           width="500"
           height="500"
           style="border: 1px solid #777"
-        />
+        ></canvas>
       </div>
       <div class="results">
         Sort Results
-        <div class="result" id="ravenclaw">
-          Ravenclaw  
-        </div>
-        <div class="result" id="gryffindor">
-          Gryffindor  
-        </div>
-        <div class="result" id="hufflepuff">
-          Hufflepuff
-        </div>
-        <div class="result" id="slytherin">
-          Slytherin  
-        </div>                        
+        <div class="result" id="ravenclaw">Ravenclaw</div>
+        <div class="result" id="gryffindor">Gryffindor</div>
+        <div class="result" id="hufflepuff">Hufflepuff</div>
+        <div class="result" id="slytherin">Slytherin</div>
       </div>
     </div>
   </body>
