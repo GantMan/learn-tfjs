@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.6.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <h1>Simplest Binarize Image</h1>
+    <h3>Input Image:</h3>
+    <img id="input" src="/skull.jpg" style="max-width: 100vw;" />
+    <h3>Output Image:</h3>
+    <canvas id="output" style="max-width: 100vw;"></canvas>
+    <script>
+      window.addEventListener('load', function () {
+        tf.tidy(() => {
+          // Simply read from the DOM
+          const inputImage = document.getElementById('input')
+          const inTensor = tf.browser.fromPixels(inputImage, 1)
+
+          // Binarize
+          const threshold = 50
+          const light = tf.onesLike(inTensor).asType('float32')
+          const dark = tf.zerosLike(inTensor)
+          const simpleBinarized = tf.where(
+            tf.less(inTensor, threshold),
+            dark, // False Case: place zero    
+            light, // True Case: place one
+          )          
+
+          // Show results
+          const myCanvas = document.getElementById('output')
+          tf.browser.toPixels(simpleBinarized, myCanvas)
+        })
+      })
+    </script>
+  </body>
+</html>
