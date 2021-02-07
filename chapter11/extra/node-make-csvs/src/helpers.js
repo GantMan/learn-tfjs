@@ -4,12 +4,13 @@ import * as fs from 'fs'
 import { default as glob } from 'glob'
 
 function encodeDir(filePath) {
-  if (filePath.includes('bishop')) return 0
-  if (filePath.includes('king')) return 1
-  if (filePath.includes('knight')) return 2
-  if (filePath.includes('pawn')) return 3
+  if (filePath.includes('pawn')) return 0
+  if (filePath.includes('knight')) return 1
+  if (filePath.includes('bishop')) return 2
+  if (filePath.includes('rook')) return 3
   if (filePath.includes('queen')) return 4
-  if (filePath.includes('rook')) return 5
+  if (filePath.includes('king')) return 5
+
   // Should never get here
   console.error('Unrecognized folder')
   process.exit(1)
@@ -37,52 +38,63 @@ function shuffleCombo(array, array2) {
 }
 
 export function folderToTensors() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     const FILE_PATH = 'files'
     // create stack in JS
     const XS = []
     const YS = []
 
     // Read images
-    console.log('Identifying JPG List')
-    glob('files/**/*.jpg', (err, files) => {
-      if (err) {
-        console.error('Failed to access JPG files', err)
-        reject()
-        process.exit(1)
-      }
+    console.log('Identifying PNG List')
 
-      console.log(`${files.length} Files Found`)
+    const pngs = glob.sync('files/**/*.png')
+    const jpgs = glob.sync('files/**/*.jpg')
+    console.log('PNGs', pngs.length)
+    console.log('JPGs', jpgs.length)
 
-      console.log('Now converting to tensors')
-      files.forEach((file) => {
-        const imageData = fs.readFileSync(file)
-        const answer = encodeDir(file)
-        const imageTensor = tf.node.decodeImage(imageData, 1)
+    const files = [...pngs, ...jpgs]
 
-        // Store in memory
-        YS.push(answer)
-        XS.push(imageTensor)
-      })
+    console.log(`${files.length} Files Found`)
 
-      // Shuffle the data (keep XS[n] === YS[n])
-      shuffleCombo(XS, YS)
+    console.log('Now converting to tensors')
+    files.forEach((file) => {
+      const imageData = fs.readFileSync(file)
+      const answer = encodeDir(file)
+      const imageTensor = tf.node.decodeImage(imageData, 1)
+      const smallTensor = tf.image.resizeNearestNeighbor(
+        imageTensor,
+        [224, 224],
+        true
+      )
 
-      // Stack values
-      console.log('Stacking')
-      const X = tf.stack(XS)
-      const Y = tf.oneHot(YS, 6)
+      const smooshedTensor = smallTensor.reshape([224*224])
 
-      console.log('Images all converted to tensors:')
-      console.log('X', X.shape)
-      console.log('Y', Y.shape)
+      // Store in memory
+      YS.push(answer)
+      XS.push(smooshedTensor)
 
-      // Normalize X to values 0 - 1
-      const XNORM = X.div(255)
-      // cleanup
-      tf.dispose([XS, X])
-
-      resolve([XNORM, Y])
+      tf.dispose([imageTensor, smallTensor])
     })
+
+    // Shuffle the data (keep XS[n] === YS[n])
+    shuffleCombo(XS, YS)
+
+    // Stack values
+    console.log('Stacking')
+    const X = tf.stack(XS)
+    const Y = tf.oneHot(YS, 6)
+
+    console.log('Images all converted to tensors:')
+    console.log('X', X.shape)
+    console.log('Y', Y.shape)
+
+    // Normalize X to values 0 - 1
+    const XNORM = X.div(255)
+    // cleanup
+    tf.dispose([XS, X])
+
+    resolve([XNORM, Y])
   })
+
 }
+
