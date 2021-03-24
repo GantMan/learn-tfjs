@@ -1,12 +1,12 @@
 # Source for O'Reilly's Learning TensorFlow.js Book
 
-## Powerful Machine Learning in JavaScript by Gant Laborde
-
-### About the Book
+Learning TensorFlow.js - Powerful Machine Learning in JavaScript by Gant Laborde
 
 ![book cover](./_art/book_medium.jpg)
 
-The book teaches you how to take advantage of the TensorFlow.js framework to implement machine learning models in the client browser or server.
+### About the Book
+
+Learn how to take advantage of the TensorFlow.js framework to implement machine learning models in the client browser or server.
 
 #### This book is intended for two audiences:
 
