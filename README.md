@@ -28,7 +28,7 @@ The folders in each chapter could be:
 
 ### Book Chapters
 
-- [**Chapter 1** _AI is Magic_](https://github.com/GantMan/learn-tfjs/tree/master/chapter1) - There is no code associated with Chapter 1 because it's an introduction to the book and concepts.
+- [**Chapter 1** _AI is Magic_](https://github.com/GantMan/learn-tfjs/tree/master/chapter1) - There is no code associated with Chapter 1 because it's an introduction to the book and concepts.  I've added small readme with some of the links mentioned in the chapter for convenience.
 - [**Chapter 2** _Introducing TensorFlow.js_](https://github.com/GantMan/learn-tfjs/tree/master/chapter2) - This chapter is focused on getting you running TensorFlow.js on a client or a server. Once you've got it running, you actually run a Toxicity classifier on given text.
 - [**Chapter 3** _Introducing Tensors_](https://github.com/GantMan/learn-tfjs/tree/master/chapter3) - This chapter helps you understand the concept and need of tensors. You then immediately use this technology to build a simple recommendation system for music.
 - [**Chapter 4** _Image Tensors_](https://github.com/GantMan/learn-tfjs/tree/master/chapter4) - Images in machine learning are a fantastic example of tensors and all the things you can do to modify complex data.
