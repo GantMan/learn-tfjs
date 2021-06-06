@@ -22,6 +22,10 @@ On macOS, PHP is pre-bundled with the OS and includes a nice little web server. 
 
 If you have Python3 on your machine, you can `cd` to the folder and run `python3 -m http.server` to host the HTML.
 
+If you'd rather use Python 2, you can also run `python -m SimpleHTTPServer` to host the HTML.
+
+Note that macOS already comes with Python 2 pre-installed.
+
 ### Node.js
 
 If you're going this far, you should just run the NPM based examples. Yes you can install `http-server` and run the project, but at this point you've jumped into an NPM solution, and you should run those.
